@@ -7,6 +7,7 @@
     },
     "main": "index.js",
     "scripts": {
+        "dev": "nodemon index.js",
         "start": "node index.js",
         "test": "node test.js",
         "prettier": "prettier --ignore-path .prettierignore --config prettier.config.js --write .",
@@ -19,9 +20,7 @@
         "express": "^4.15.2"
     },
     "devDependencies": {
-        "got": "^11.3.0",
-        "nodemon": "^2.0.20",
-        "tape": "^4.7.0"
+        "nodemon": "^2.0.20"
     },
     "repository": {
         "type": "git",
