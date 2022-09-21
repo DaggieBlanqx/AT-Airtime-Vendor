@@ -148,14 +148,37 @@ const createBusinessOwnerFile = ({ apiKey, username, password }) => {
     });
 };
 
-const createAirtimeLogs = async ({ singleTransaction }) => {
-    let filePath = `${process.cwd()}/data_store/logs.json`;
+const createAirtimeLogs = ({ singleTransaction }) => {
+    return new Promise(async (resolve, reject) => {
+        let filePath = `${process.cwd()}/data_store/logs.json`;
 
-    const allTransactions = [];
+        const allTransactions = [];
 
-    if (doesFileExist(filePath)) {
-        const _existingTransactions = readJSONFile({ filePath });
-    }
+        const Logs = await readJSONFile({ filePath });
+
+        if (Logs.status !== 'successful') {
+            reject(FAIL({ ...Logs }));
+        }
+
+        console.log({ Logs });
+
+        Logs.data.map((log) => allTransactions.push(log));
+
+        allTransactions.push(singleTransaction);
+
+        const output = await writeJSONFile({
+            data: allTransactions,
+            filePath,
+        });
+
+        if (output.status === 'successful') {
+            resolve({
+                status: 'succesful',
+            });
+        } else {
+            reject(FAIL({ ...output }));
+        }
+    });
 };
 
 module.exports = {
@@ -163,4 +186,5 @@ module.exports = {
     doesFileExist,
     writeJSONFile,
     createBusinessOwnerFile,
+    createAirtimeLogs,
 };
