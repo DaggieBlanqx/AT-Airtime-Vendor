@@ -7,11 +7,11 @@
 A super simple way to start vending Airtime using AfricasTalking API in 15seconds.
 
 1. ## Running Locally
-Make sure you have [Node.js](http://nodejs.org/) and the [Heroku CLI](https://cli.heroku.com/) installed.
+    Make sure you have [Node.js](http://nodejs.org/) and the [Heroku CLI](https://cli.heroku.com/) installed.
 
 ```sh
 $ git clone https://github.com/DaggieBlanqx/AT-Airtime-Vendor # or clone your own fork
-$ cd AT-Airtime-Vendor 
+$ cd AT-Airtime-Vendor
 $ npm install
 $ npm start
 ```
@@ -32,6 +32,6 @@ or
   <img src="https://www.herokucdn.com/deploy/button.svg" alt="Deploy">
 </a>
 
-
 ## Documentation
+
 For more information, send us a slack message: https://slack.africastalking.com/

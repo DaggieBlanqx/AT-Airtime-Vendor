@@ -11,6 +11,48 @@ const {
 
 router.get('/', (req, res) => res.render('pages/index'));
 
+router.post('/sign_up', async (req, res) => {
+    //receive Admin username and password -> then save it
+    const admin_username = req.body.admin_username;
+    const admin_password = req.body.admin_password;
+
+    const output = await createBusinessOwnerFile({
+        admin_username,
+        admin_password,
+    });
+
+    if (output.status === 'successful') {
+        req.session.user = {
+            admin_username,
+        };
+        // good
+        res.json({
+            admin_username,
+            admin_password,
+            output,
+        });
+    } else {
+        //bad
+        res.status(500).json(output);
+    }
+});
+
+router.post('/sign_in', (req, res) => {
+    //receive Admin username and password
+    const admin_username = req.body.admin_username;
+    const admin_password = req.body.admin_password;
+
+    console.log();
+});
+
+router.post('/add_at_credentials', (req, res) => {
+    //receive API Keys and username
+});
+
+router.post('/send_airtime', (req, res) => {
+    //receive phone numbers and amount
+});
+
 router.get('/send/:amount/:phoneNumber', async (req, res) => {
     try {
         let phoneNumber = req.params.phoneNumber;

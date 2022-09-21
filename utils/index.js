@@ -112,7 +112,7 @@ const readJSONFile = ({ filePath }) => {
     });
 };
 
-const createBusinessOwnerFile = ({ apiKey, username, password }) => {
+const _createBusinessOwnerFile = ({ apiKey, username, password }) => {
     return new Promise(async (resolve, reject) => {
         let filePath = `${process.cwd()}/config/production.json`;
 
@@ -168,6 +168,60 @@ const createBusinessOwnerFile = ({ apiKey, username, password }) => {
     });
 };
 
+const createBusinessOwnerFile = (data) => {
+    return new Promise(async (resolve, reject) => {
+        let filePath = `${process.cwd()}/config/production.json`;
+
+        let newData = {};
+        let combinedData = {};
+
+        if (data.apiKey) {
+            newData['apiKey'] = data.apiKey;
+        }
+
+        if (data.username) {
+            newData['username'] = data.username;
+        }
+
+        if (data.admin_username) {
+            newData['admin_username'] = data.admin_username;
+        }
+
+        if (data.admin_password) {
+            newData['admin_password'] = data.admin_password;
+        }
+
+        const prodFile = await readJSONFile({ filePath });
+
+        if (prodFile.status !== 'successful') {
+            reject(FAIL({ ...prodFile }));
+        }
+
+        let oldData = prodFile.data?.WEB_APP || {};
+
+        combinedData = {
+            WEB_APP: {
+                ...oldData,
+                ...newData,
+            },
+        };
+
+        console.log({ combinedData });
+
+        const newFile = await writeJSONFile({ data: combinedData, filePath });
+
+        if (newFile.status === 'successful') {
+            resolve({
+                status: 'successful',
+                // message:
+                //     'Congratulations! Your business is now ready to vend some airtime.',
+            });
+        } else {
+            reject(FAIL());
+        }
+    });
+};
+
 const createAirtimeLogs = ({ singleTransaction }) => {
     return new Promise(async (resolve, reject) => {
         let filePath = `${process.cwd()}/data_store/logs.json`;
@@ -179,8 +233,6 @@ const createAirtimeLogs = ({ singleTransaction }) => {
         if (Logs.status !== 'successful') {
             reject(FAIL({ ...Logs }));
         }
-
-        console.log({ Logs });
 
         Logs.data.map((log) => allTransactions.push(log));
 
