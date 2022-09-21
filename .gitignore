@@ -109,7 +109,6 @@ sw.*
 # public/
 
 public/audios/scheduled_outgoing_calls/*.mp3
-
 client_secret.json
 yarn.lock
 *.lock
@@ -119,3 +118,4 @@ package-lock.json
 .roughwork.txt
 public/csv_files/instant_bulkcalls_contacts/*.csv
 public/audios/instant_bulkcalls_audio/*.mp3
+config/development.json
