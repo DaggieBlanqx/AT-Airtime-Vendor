@@ -5,7 +5,6 @@ const router = express.Router();
 const {
     sendAirtime,
     doesFileExist,
-    writeToFile,
     createBusinessOwnerFile,
 } = require('../utils/index');
 
@@ -26,14 +25,14 @@ router.get('/send/:amount/:phoneNumber', async (req, res) => {
 router.get('/test', async (req, res) => {
     let developmentJSONFile = `${process.cwd()}/config/test.json`;
 
-    let xyz = await writeToFile({
+    let xyz = await {
         data: {
             username: 'daggie',
             apiKey: 'abcd',
             password: 12434,
         },
         filePath: developmentJSONFile,
-    });
+    };
 
     res.json({
         developmentJSONFile,

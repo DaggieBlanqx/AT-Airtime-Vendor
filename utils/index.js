@@ -48,7 +48,7 @@ const doesFileExist = ({ filePath }) => {
     }
 };
 
-const writeToFile = ({ data, filePath }) => {
+const writeJSONFile = ({ data, filePath }) => {
     return new Promise((resolve, reject) => {
         //check if data is valid JSON
         if (validate.isEmpty(data)) {
@@ -74,6 +74,19 @@ const writeToFile = ({ data, filePath }) => {
             resolve({
                 status: 'successful',
                 data,
+            });
+        });
+    });
+};
+
+const readJSONFile = ({ filePath }) => {
+    return new Promise((resolve, reject) => {
+        fs.readFile(filePath, (err, data) => {
+            if (err) throw reject(FAIL({ ...err }));
+
+            resolve({
+                status: 'successful',
+                data: JSON.parse(data),
             });
         });
     });
@@ -121,7 +134,7 @@ const createBusinessOwnerFile = ({ apiKey, username, password }) => {
             },
         };
 
-        const newFile = await writeToFile({ data, filePath });
+        const newFile = await writeJSONFile({ data, filePath });
 
         if (newFile.status === 'successful') {
             resolve({
@@ -135,9 +148,19 @@ const createBusinessOwnerFile = ({ apiKey, username, password }) => {
     });
 };
 
+const createAirtimeLogs = async ({ singleTransaction }) => {
+    let filePath = `${process.cwd()}/data_store/logs.json`;
+
+    const allTransactions = [];
+
+    if (doesFileExist(filePath)) {
+        const _existingTransactions = readJSONFile({ filePath });
+    }
+};
+
 module.exports = {
     sendAirtime,
     doesFileExist,
-    writeToFile,
+    writeJSONFile,
     createBusinessOwnerFile,
 };
