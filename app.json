@@ -1,0 +1,8 @@
+{
+    "name": "AT Airtime Vendor",
+    "description": "Start your airtime-vending business in 15seconds",
+    "repository": "https://github.com/DaggieBlanqx/AT-Airtime-Vendor",
+    "logo": "https://africastalking.com/img/logo_color.svg",
+    "keywords": ["node", "express", "heroku", "africastalking"],
+    "image": "heroku/nodejs"
+}
