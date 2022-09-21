@@ -10,14 +10,17 @@
         "start": "node index.js",
         "test": "node test.js",
         "prettier": "prettier --ignore-path .prettierignore --config prettier.config.js --write .",
-        "quickpush": "cls || clear && git status && git add * && git commit * -m \"Updated Code\" && git push"
+        "quickpush": "git status && git add * && git commit * -m \"Updated Code\" && git push"
     },
     "dependencies": {
+        "africastalking": "^0.5.5",
+        "config": "^3.3.8",
         "ejs": "^3.1.5",
         "express": "^4.15.2"
     },
     "devDependencies": {
         "got": "^11.3.0",
+        "nodemon": "^2.0.20",
         "tape": "^4.7.0"
     },
     "repository": {
