@@ -28,8 +28,28 @@ const sendAirtime = ({ phoneNumber, amount, currencyCode }) => {
         };
 
         AT_Airtime.send(options)
-            .then((response) => resolve(response))
-            .catch((error) => reject(error));
+            .then((response) =>
+                resolve({
+                    status: 'successful',
+                    result: response,
+                })
+            )
+            .catch((error) => {
+                // console.error({error})
+                if (error?.toString()?.includes('status code 401')) {
+                    reject(
+                        FAIL({
+                            message: 'Invalid apiKey and username',
+                        })
+                    );
+                } else {
+                    reject(
+                        FAIL({
+                            ...error,
+                        })
+                    );
+                }
+            });
     });
 };
 

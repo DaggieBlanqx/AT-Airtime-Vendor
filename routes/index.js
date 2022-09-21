@@ -12,15 +12,24 @@ const {
 router.get('/', (req, res) => res.render('pages/index'));
 
 router.get('/send/:amount/:phoneNumber', async (req, res) => {
-    let phoneNumber = req.params.phoneNumber;
-    let amount = req.params.amount;
+    try {
+        let phoneNumber = req.params.phoneNumber;
+        let amount = req.params.amount;
 
-    const outcome = await sendAirtime({
-        phoneNumber,
-        amount,
-    });
+        const outcome = await sendAirtime({
+            phoneNumber,
+            amount,
+        });
 
-    res.json({ outcome, amount, phoneNumber });
+        if (outcome.status === 'successful') {
+            res.json({ ...outcome });
+        } else {
+            res.json({ ...outcome });
+        }
+    } catch (err) {
+        res.json({ err });
+    }
+    // res.json({ outcome, amount, phoneNumber });
 });
 
 router.get('/test', async (req, res) => {
