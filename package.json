@@ -17,7 +17,8 @@
         "africastalking": "^0.5.5",
         "config": "^3.3.8",
         "ejs": "^3.1.5",
-        "express": "^4.15.2"
+        "express": "^4.15.2",
+        "validate.js": "^0.13.1"
     },
     "devDependencies": {
         "nodemon": "^2.0.20"
