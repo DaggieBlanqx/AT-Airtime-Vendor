@@ -3,6 +3,7 @@ const express = require('express');
 const { phone } = require('phone');
 
 const router = express.Router();
+const data = require('../data_store/logs.json');
 
 const {
     sendAirtime,
@@ -11,8 +12,30 @@ const {
     createAirtimeLogs,
     getAdminInfo,
 } = require('../utils/index');
-
+let analyticsInfo = ()=> {
+    // console.log(data);
+    let finalData = data.map(element => {
+        let fragData = element.responses;
+        // console.log('fragdata', fragData);
+        let result = fragData.map((el) => {
+            console.log('element', el);
+            let elem = {...el}
+            return elem;
+        });
+        console.log('result', result);
+        // console,log('amaount', fragData.amount);
+        // let result = [...fragData];
+        return  result;
+    });
+    // console.log('responses',...finalData);
+    // console.log('json', JSON.stringify(finalData))
+}
 router.get('/', (req, res) => res.render('pages/index'));
+router.get('/credentials', (req, res) => res.render('pages/credentials'));
+router.get('/airtime', (req, res) => res.render('pages/airtime'));
+router.get('/analytics', (req, res) => res.render('pages/analytics', {
+    responseData: analyticsInfo(),
+}));
 
 router.post('/sign_up', async (req, res) => {
     //receive Admin username and password -> then save it
