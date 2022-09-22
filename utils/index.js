@@ -15,16 +15,17 @@ const FAIL = ({ message }) => {
     };
 };
 
-const sendAirtime = ({ phoneNumber, amount, currencyCode }) => {
+const sendAirtime = ({ phoneNumbers, amount, currencyCode }) => {
     return new Promise((resolve, reject) => {
+        const recipients = phoneNumbers.map((phoneNumber)=>{
+            return({
+                phoneNumber,
+                currencyCode: currencyCode || 'KES',
+                amount,
+            });
+        });
         const options = {
-            recipients: [
-                {
-                    phoneNumber,
-                    currencyCode: currencyCode || 'KES',
-                    amount,
-                },
-            ],
+            recipients,
         };
 
         AT_Airtime.send(options)

@@ -81,45 +81,41 @@ router.post('/add_at_credentials', async (req, res) => {
 
 router.post('/send_airtime', async (req, res) => {
     //receive phone numbers and amount
+    let errors = [];
+    let phoneNumbers = [];
 
-    let _phoneNumber = req.body.phoneNumber;
+    let _phoneNumbers = req.body.phoneNumbers;
     let amount = req.body.amount;
 
-    let phoneInfo = phone(_phoneNumber, { country: 'TZ' }); // OR KE
+    let recipients = _phoneNumbers?.split(',');
 
-    console.log({ phoneInfo });
+    recipients.map((rp)=>{
+        let phoneInfo = phone(_phoneNumber, { country: 'TZ' }); // OR KE
+        if(!phoneInfo.isValid){
+            errors.push(`Invalid phone: ${rp}`)
+        }else{
+            phoneNumbers.push(rp);
+        };
+    });
 
-    const airtimeResult = await sendAirtime({ phoneNumber, amount });
+    if(errors.length){
+        res.json({
+            errors
+        })
+    }
+
+
+    const airtimeResult = await sendAirtime({ phoneNumbers, amount });
     if (airtimeResult.status === 'successful') {
         // write to file
         let output = await createAirtimeLogs({
             singleTransaction: airtimeResult.data,
         });
     } else {
+        res.status(500).json({
+            ...airtimeResult
+        })
     }
-});
-
-router.get('/send/:amount/:phoneNumber', async (req, res) => {
-    try {
-        let _phoneNumber = req.params.phoneNumber;
-        let amount = req.params.amount;
-
-        let phoneInfoA = phone(_phoneNumber, { country: 'TZ' }); // OR TZ
-
-        const outcome = await sendAirtime({
-            phoneNumber,
-            amount,
-        });
-
-        if (outcome.status === 'successful') {
-            res.json({ ...outcome });
-        } else {
-            res.json({ ...outcome });
-        }
-    } catch (err) {
-        res.json({ err });
-    }
-    // res.json({ outcome, amount, phoneNumber });
 });
 
 router.get('/test', async (req, res) => {
