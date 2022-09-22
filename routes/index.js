@@ -1,5 +1,7 @@
 'use strict';
 const express = require('express');
+const { phone } = require('phone');
+
 const router = express.Router();
 
 const {
@@ -7,6 +9,7 @@ const {
     doesFileExist,
     createBusinessOwnerFile,
     createAirtimeLogs,
+    getAdminInfo,
 } = require('../utils/index');
 
 router.get('/', (req, res) => res.render('pages/index'));
@@ -37,26 +40,71 @@ router.post('/sign_up', async (req, res) => {
     }
 });
 
-router.post('/sign_in', (req, res) => {
+router.post('/sign_in', async (req, res) => {
     //receive Admin username and password
     const admin_username = req.body.admin_username;
     const admin_password = req.body.admin_password;
 
-    console.log();
+    if (!admin_password || !admin_username) {
+    }
+    let data = await getAdminInfo();
+
+    console.log({
+        admin_username,
+        admin_password,
+        data,
+    });
 });
 
-router.post('/add_at_credentials', (req, res) => {
+router.post('/add_at_credentials', async (req, res) => {
     //receive API Keys and username
+    const apiKey = req.body.apiKey;
+    const username = req.body.username;
+
+    const output = await createBusinessOwnerFile({
+        apiKey,
+        username,
+    });
+
+    if (output.status === 'successful') {
+        //good
+        res.json({
+            admin_username,
+            admin_password,
+            output,
+        });
+    } else {
+        //bad
+        res.status(500).json(output);
+    }
 });
 
-router.post('/send_airtime', (req, res) => {
+router.post('/send_airtime', async (req, res) => {
     //receive phone numbers and amount
+
+    let _phoneNumber = req.body.phoneNumber;
+    let amount = req.body.amount;
+
+    let phoneInfo = phone(_phoneNumber, { country: 'TZ' }); // OR KE
+
+    console.log({ phoneInfo });
+
+    const airtimeResult = await sendAirtime({ phoneNumber, amount });
+    if (airtimeResult.status === 'successful') {
+        // write to file
+        let output = await createAirtimeLogs({
+            singleTransaction: airtimeResult.data,
+        });
+    } else {
+    }
 });
 
 router.get('/send/:amount/:phoneNumber', async (req, res) => {
     try {
-        let phoneNumber = req.params.phoneNumber;
+        let _phoneNumber = req.params.phoneNumber;
         let amount = req.params.amount;
+
+        let phoneInfoA = phone(_phoneNumber, { country: 'TZ' }); // OR TZ
 
         const outcome = await sendAirtime({
             phoneNumber,

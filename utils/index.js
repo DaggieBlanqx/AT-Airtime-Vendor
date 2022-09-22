@@ -222,6 +222,33 @@ const createBusinessOwnerFile = (data) => {
     });
 };
 
+const getAdminInfo = () => {
+    return new Promise(async (resolve, reject) => {
+        let filePath = `${process.cwd()}/config/production.json`;
+
+        const d = await readJSONFile({ filePath });
+        if (d.status === 'successful') {
+            var prodFile = d.data?.WEB_APP;
+            let admin_password = prodFile?.admin_password;
+            let admin_username = prodFile?.admin_username;
+
+            resolve({
+                status: 'successful',
+                data: {
+                    admin_password,
+                    admin_username,
+                },
+            });
+        } else {
+            reject(
+                FAIL({
+                    message: 'could not load user profile',
+                })
+            );
+        }
+    });
+};
+
 const createAirtimeLogs = ({ singleTransaction }) => {
     return new Promise(async (resolve, reject) => {
         let filePath = `${process.cwd()}/data_store/logs.json`;
@@ -259,4 +286,5 @@ module.exports = {
     writeJSONFile,
     createBusinessOwnerFile,
     createAirtimeLogs,
+    getAdminInfo,
 };
