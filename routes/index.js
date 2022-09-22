@@ -89,21 +89,20 @@ router.post('/send_airtime', async (req, res) => {
 
     let recipients = _phoneNumbers?.split(',');
 
-    recipients.map((rp)=>{
+    recipients.map((rp) => {
         let phoneInfo = phone(_phoneNumber, { country: 'TZ' }); // OR KE
-        if(!phoneInfo.isValid){
-            errors.push(`Invalid phone: ${rp}`)
-        }else{
+        if (!phoneInfo.isValid) {
+            errors.push(`Invalid phone: ${rp}`);
+        } else {
             phoneNumbers.push(rp);
-        };
+        }
     });
 
-    if(errors.length){
+    if (errors.length) {
         res.json({
-            errors
-        })
+            errors,
+        });
     }
-
 
     const airtimeResult = await sendAirtime({ phoneNumbers, amount });
     if (airtimeResult.status === 'successful') {
@@ -113,8 +112,8 @@ router.post('/send_airtime', async (req, res) => {
         });
     } else {
         res.status(500).json({
-            ...airtimeResult
-        })
+            ...airtimeResult,
+        });
     }
 });
 

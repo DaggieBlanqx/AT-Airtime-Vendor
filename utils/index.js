@@ -17,12 +17,12 @@ const FAIL = ({ message }) => {
 
 const sendAirtime = ({ phoneNumbers, amount, currencyCode }) => {
     return new Promise((resolve, reject) => {
-        const recipients = phoneNumbers.map((phoneNumber)=>{
-            return({
+        const recipients = phoneNumbers.map((phoneNumber) => {
+            return {
                 phoneNumber,
                 currencyCode: currencyCode || 'KES',
                 amount,
-            });
+            };
         });
         const options = {
             recipients,
