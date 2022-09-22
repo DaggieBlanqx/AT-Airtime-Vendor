@@ -11,14 +11,15 @@
     </a>
     <h2>Airtime Vendor</h2>
     <%- include ("../partials/nav.ejs") %> 
-    <form>
+    <form method="POST" action="/send_airtime">
+      <h6>Add a number starting with +254 or +255 separated by comma(,)</h6>
       <div class="form-group row">
 		<div class="col-sm-3">
 
 			<label for="phoneNumber">Phone Number</label>
 		</div>
         <div class="col-sm-6">
-          <input type="text" class="form-control" id="phoneNumber" aria-describedby="phone number" placeholder="Enter phone number">
+          <input type="text" class="form-control" id="phoneNumber" aria-describedby="phone number" placeholder="+255710852963, +255754896321" multiple size="150" name="phoneNumbers">
         </div>
       </div>
 	  <div class="form-group row">
@@ -26,7 +27,7 @@
 			<label for="amount">Amount</label>
 		</div>
         <div class="col-sm-6">
-          <input type="number" class="form-control" id="amount" aria-describedby="amount" placeholder="Enter amount">
+          <input type="number" class="form-control" id="amount" aria-describedby="amount" placeholder="Enter amount" name="amount">
         </div>
       </div>
 	  <div class="btn-div">
@@ -37,3 +38,6 @@
 </div>
 </body>
 </html>
+<script>
+  
+</script>
