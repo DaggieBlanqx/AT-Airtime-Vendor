@@ -24,9 +24,7 @@
         "express": "^4.15.2",
         "express-session": "^1.17.3",
         "phone": "^3.1.28",
-        "validate.js": "^0.13.1"
-    },
-    "devDependencies": {
+        "validate.js": "^0.13.1",
         "nodemon": "^2.0.20",
         "prettier": "^2.7.1"
     },

@@ -3,11 +3,6 @@ const fs = require('fs');
 const validate = require('validate.js');
 const AfricasTalking = require('africastalking');
 
-const AT_Airtime = AfricasTalking({
-    apiKey: process.env.apiKey,
-    username: process.env.username,
-}).AIRTIME;
-
 const FAIL = ({ message }) => {
     return {
         status: 'failed',
@@ -15,8 +10,19 @@ const FAIL = ({ message }) => {
     };
 };
 
-const sendAirtime = ({ phoneNumbers, amount, currencyCode }) => {
+const sendAirtime = ({
+    apiKey,
+    username,
+    phoneNumbers,
+    amount,
+    currencyCode,
+}) => {
     return new Promise((resolve, reject) => {
+        const AT_Airtime = AfricasTalking({
+            apiKey: apiKey || process.env.apiKey,
+            username: username || process.env.username,
+        }).AIRTIME;
+
         const recipients = phoneNumbers.map((phoneNumber) => {
             return {
                 phoneNumber,
@@ -296,4 +302,5 @@ module.exports = {
     createBusinessOwnerFile,
     createAirtimeLogs,
     getAdminInfo,
+    readJSONFile,
 };
