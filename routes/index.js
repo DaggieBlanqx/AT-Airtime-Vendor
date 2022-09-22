@@ -14,7 +14,7 @@ let analyticsInfo = ()=> {
         let fragData = element.responses;
         // console.log('fragdata', fragData);
         let result = fragData.map((el) => {
-            // console.log('element', el);
+            console.log('element', el);
             let elem = {...el}
             return elem;
         });
