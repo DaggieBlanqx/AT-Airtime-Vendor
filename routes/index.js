@@ -12,30 +12,32 @@ const {
     createAirtimeLogs,
     getAdminInfo,
 } = require('../utils/index');
-let analyticsInfo = ()=> {
+let analyticsInfo = () => {
     // console.log(data);
-    let finalData = data.map(element => {
+    let finalData = data.map((element) => {
         let fragData = element.responses;
         // console.log('fragdata', fragData);
         let result = fragData.map((el) => {
             console.log('element', el);
-            let elem = {...el}
+            let elem = { ...el };
             return elem;
         });
         console.log('result', result);
         // console,log('amaount', fragData.amount);
         // let result = [...fragData];
-        return  result;
+        return result;
     });
     // console.log('responses',...finalData);
     // console.log('json', JSON.stringify(finalData))
-}
+};
 router.get('/', (req, res) => res.render('pages/index'));
 router.get('/credentials', (req, res) => res.render('pages/credentials'));
 router.get('/airtime', (req, res) => res.render('pages/airtime'));
-router.get('/analytics', (req, res) => res.render('pages/analytics', {
-    responseData: analyticsInfo(),
-}));
+router.get('/analytics', (req, res) =>
+    res.render('pages/analytics', {
+        responseData: analyticsInfo(),
+    })
+);
 
 router.post('/sign_up', async (req, res) => {
     //receive Admin username and password -> then save it
@@ -48,6 +50,7 @@ router.post('/sign_up', async (req, res) => {
     });
 
     if (output.status === 'successful') {
+        res.redirect('/credentials');
         req.session.user = {
             admin_username,
         };
@@ -94,13 +97,16 @@ router.post('/add_at_credentials', async (req, res) => {
         username,
     });
 
+    console.log({ output });
+
     if (output.status === 'successful') {
         //good
-        return res.json({
-            admin_username,
-            admin_password,
-            output,
-        });
+        return res.redirect('/airtime');
+        // return res.json({
+        //     admin_username,
+        //     admin_password,
+        //     output,
+        // });
     } else {
         //bad
         return res.status(500).json(output);
@@ -118,12 +124,21 @@ router.post('/send_airtime', async (req, res) => {
     let recipients = _phoneNumbers?.split(',');
 
     recipients.map((rp) => {
-        let phoneInfo = phone(_phoneNumber, { country: 'TZ' }); // OR KE
+       
+       /* let phoneInfoTz = phone(_phoneNumbers, { country: 'TZ' }); // OR KE
+
+        let phoneInfo = {};
+        if(phoneInfoTz.isValid){
+            phoneInfo['isValid'] = phoneInfoTz.isValid;
+            phoneInfo['']
+        }
+
         if (!phoneInfo.isValid) {
             errors.push(`Invalid phone: ${rp}`);
         } else {
             phoneNumbers.push(rp);
         }
+        */
     });
 
     if (errors.length) {
@@ -138,6 +153,12 @@ router.post('/send_airtime', async (req, res) => {
         let output = await createAirtimeLogs({
             singleTransaction: airtimeResult.data,
         });
+
+        if (output.status === 'successful') {
+            res.redirect('/analytics');
+        } else {
+            res.json(output);
+        }
     } else {
         return res.status(500).json({
             ...airtimeResult,
