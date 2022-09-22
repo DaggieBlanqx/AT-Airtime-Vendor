@@ -124,21 +124,17 @@ router.post('/send_airtime', async (req, res) => {
     let recipients = _phoneNumbers?.split(',');
 
     recipients.map((rp) => {
-       
-       /* let phoneInfoTz = phone(_phoneNumbers, { country: 'TZ' }); // OR KE
+        let phoneRegex = /^(\+[1-9]{1,3})?\d{4,}$/
 
-        let phoneInfo = {};
-        if(phoneInfoTz.isValid){
-            phoneInfo['isValid'] = phoneInfoTz.isValid;
-            phoneInfo['']
-        }
-
-        if (!phoneInfo.isValid) {
-            errors.push(`Invalid phone: ${rp}`);
-        } else {
+        if(phoneRegex.test(rp)){
             phoneNumbers.push(rp);
+
+            
+        }else{
+            errors.push(`Invalid phone: ${rp}`);
+
         }
-        */
+        
     });
 
     if (errors.length) {
