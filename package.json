@@ -9,11 +9,11 @@
     "scripts": {
         "dev": "nodemon index.js",
         "start": "node index.js",
-        "test": "node test.js",
         "prettier": "prettier --ignore-path .prettierignore --config prettier.config.js --write .",
         "quickpush": "git status && git add * && git commit * -m \"Updated Code\" && git push",
         "heroku:login": "heroku login",
-        "heroku:logs": "eroku logs --tail --app mnbq_webapp"
+        "heroku:logs": "heroku logs --tail --app app_name",
+        "heroku:bash": "heroku run bash --app app_name"
     },
     "dependencies": {
         "africastalking": "^0.5.5",
