@@ -12,31 +12,32 @@ const {
     createAirtimeLogs,
     getAdminInfo,
 } = require('../utils/index');
-let analyticsInfo = () => {
+let analyticsInfo = ()=> {
     // console.log(data);
-    let finalData = data.map((element) => {
+    let dataResult = [];
+    data.map(element => {
         let fragData = element.responses;
-        // console.log('fragdata', fragData);
-        let result = fragData.map((el) => {
-            console.log('element', el);
-            let elem = { ...el };
-            return elem;
-        });
-        console.log('result', result);
-        // console,log('amaount', fragData.amount);
-        // let result = [...fragData];
-        return result;
+        let numbSent = element.numSent;
+        if( numbSent !== 0) {
+
+            let result = fragData.map((el) => {
+                let elem = {...el}
+                dataResult.push(elem);
+            });
+            
+        } else {
+            return {};
+        }
     });
-    // console.log('responses',...finalData);
-    // console.log('json', JSON.stringify(finalData))
-};
+    return dataResult;
+}
 
 router.get('/', async (req, res) => {
     let adminInfo = await getAdminInfo();
 
     if (adminInfo.status === 'successful') {
         let data = adminInfo.data;
-        
+
         const existing_admin_username = data?.admin_username;
         const existing_admin_password = data?.admin_password;
 
