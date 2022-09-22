@@ -119,3 +119,4 @@ package-lock.json
 public/csv_files/instant_bulkcalls_contacts/*.csv
 public/audios/instant_bulkcalls_audio/*.mp3
 config/development.json
+config/production.json
