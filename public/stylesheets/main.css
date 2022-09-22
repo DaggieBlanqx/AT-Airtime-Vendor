@@ -18,6 +18,10 @@
     /* max-height: 60vh;
     overflow: hidden; */
 }
+.jumbotron h6 {
+    display: flex;
+    text-align: center;
+}
 .jumbotron .btn-div {
     display: flex;
     justify-content: center;
