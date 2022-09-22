@@ -29,14 +29,14 @@ router.post('/sign_up', async (req, res) => {
             admin_username,
         };
         // good
-        res.json({
+        return res.json({
             admin_username,
             admin_password,
             output,
         });
     } else {
         //bad
-        res.status(500).json(output);
+        return res.status(500).json(output);
     }
 });
 
@@ -46,10 +46,15 @@ router.post('/sign_in', async (req, res) => {
     const admin_password = req.body.admin_password;
 
     if (!admin_password || !admin_username) {
+        return res.status(400).json({
+            status: 'failed',
+            message: 'Invalid username or password',
+        });
     }
+
     let data = await getAdminInfo();
 
-    console.log({
+    return res.json({
         admin_username,
         admin_password,
         data,
@@ -68,14 +73,14 @@ router.post('/add_at_credentials', async (req, res) => {
 
     if (output.status === 'successful') {
         //good
-        res.json({
+        return res.json({
             admin_username,
             admin_password,
             output,
         });
     } else {
         //bad
-        res.status(500).json(output);
+        return res.status(500).json(output);
     }
 });
 
@@ -99,7 +104,7 @@ router.post('/send_airtime', async (req, res) => {
     });
 
     if (errors.length) {
-        res.json({
+        return res.json({
             errors,
         });
     }
@@ -111,10 +116,17 @@ router.post('/send_airtime', async (req, res) => {
             singleTransaction: airtimeResult.data,
         });
     } else {
-        res.status(500).json({
+        return res.status(500).json({
             ...airtimeResult,
         });
     }
+});
+
+router.get('/sales', (req, res) => {
+    res.json({
+        status: 'succcessful',
+        data: {},
+    });
 });
 
 module.exports = router;
