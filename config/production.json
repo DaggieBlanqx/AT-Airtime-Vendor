@@ -1,8 +1,8 @@
 {
     "WEB_APP": {
         "admin_username": "admin",
-        "apiKey": "1234567",
-        "username": "12345",
-        "admin_password": "12345"
+        "admin_password": "12345",
+        "apiKey": "sertyuiop;'",
+        "username": "daggie"
     }
 }

@@ -1,1 +1,27 @@
-[]
+[
+    null,
+    null,
+    {
+        "errorMessage": "A duplicate request was received within the last 5 minutes",
+        "numSent": 0,
+        "responses": [],
+        "totalAmount": "0",
+        "totalDiscount": "0"
+    },
+    {
+        "errorMessage": "None",
+        "numSent": 1,
+        "responses": [
+            {
+                "amount": "KES 5.0000",
+                "discount": "KES 0.2000",
+                "errorMessage": "None",
+                "phoneNumber": "+254705212848",
+                "requestId": "ATQid_31037d81c57cbac0671a8a027e43b10b",
+                "status": "Sent"
+            }
+        ],
+        "totalAmount": "KES 5.0000",
+        "totalDiscount": "KES 0.2000"
+    }
+]

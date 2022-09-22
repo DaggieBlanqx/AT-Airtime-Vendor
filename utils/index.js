@@ -28,15 +28,23 @@ const sendAirtime = ({ phoneNumbers, amount, currencyCode }) => {
             recipients,
         };
 
-        AT_Airtime.send(options)
-            .then((response) =>
-                resolve({
-                    status: 'successful',
-                    result: response,
-                })
-            )
+        return AT_Airtime.send(options)
+            .then((response) => {
+                if (response.numSent < 1) {
+                    reject(
+                        FAIL({
+                            message: response.errorMessage,
+                        })
+                    );
+                } else {
+                    resolve({
+                        status: 'successful',
+                        result: response,
+                    });
+                }
+            })
             .catch((error) => {
-                // console.error({error})
+                console.error({ error });
                 if (error?.toString()?.includes('status code 401')) {
                     reject(
                         FAIL({

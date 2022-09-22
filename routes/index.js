@@ -50,16 +50,11 @@ router.post('/sign_up', async (req, res) => {
     });
 
     if (output.status === 'successful') {
-        res.redirect('/credentials');
         req.session.user = {
             admin_username,
         };
         // good
-        return res.json({
-            admin_username,
-            admin_password,
-            output,
-        });
+        return res.redirect('/credentials');
     } else {
         //bad
         return res.status(500).json(output);
@@ -114,50 +109,55 @@ router.post('/add_at_credentials', async (req, res) => {
 });
 
 router.post('/send_airtime', async (req, res) => {
-    //receive phone numbers and amount
-    let errors = [];
-    let phoneNumbers = [];
+    try {
+        //receive phone numbers and amount
+        let errors = [];
+        let phoneNumbers = [];
 
-    let _phoneNumbers = req.body.phoneNumbers;
-    let amount = req.body.amount;
+        let _phoneNumbers = req.body.phoneNumbers;
+        let amount = req.body.amount;
 
-    let recipients = _phoneNumbers?.split(',');
+        let recipients = _phoneNumbers?.split(',');
 
-    recipients.map((rp) => {
-        let phoneRegex = /^(\+[1-9]{1,3})?\d{4,}$/
+        recipients.map((rp) => {
+            let phoneRegex = /^(\+[1-9]{1,3})?\d{4,}$/;
 
-        if(phoneRegex.test(rp)){
-            phoneNumbers.push(rp);
+            if (phoneRegex.test(rp)) {
+                phoneNumbers.push(rp);
+            } else {
+                errors.push(`Invalid phone: ${rp}`);
+            }
+        });
 
-            
-        }else{
-            errors.push(`Invalid phone: ${rp}`);
-
+        if (errors.length) {
+            return res.json({
+                errors,
+            });
         }
-        
-    });
 
-    if (errors.length) {
-        return res.json({
-            errors,
-        });
-    }
+        const airtimeResult = await sendAirtime({ phoneNumbers, amount });
+        if (airtimeResult.status === 'successful') {
+            // write to file
+            console.log({ airtimeResult });
+            let output = await createAirtimeLogs({
+                singleTransaction: airtimeResult.result,
+            });
 
-    const airtimeResult = await sendAirtime({ phoneNumbers, amount });
-    if (airtimeResult.status === 'successful') {
-        // write to file
-        let output = await createAirtimeLogs({
-            singleTransaction: airtimeResult.data,
-        });
-
-        if (output.status === 'successful') {
-            res.redirect('/analytics');
+            if (output.status === 'successful') {
+                return res.redirect('/analytics');
+            } else {
+                console.log({ output });
+                return res.redirect('/analytics');
+                return res.json(output);
+            }
         } else {
-            res.json(output);
+            return res.status(500).json({
+                ...airtimeResult,
+            });
         }
-    } else {
+    } catch (err) {
         return res.status(500).json({
-            ...airtimeResult,
+            ...err,
         });
     }
 });
