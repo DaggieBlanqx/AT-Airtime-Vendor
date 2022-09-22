@@ -30,7 +30,26 @@ let analyticsInfo = () => {
     // console.log('responses',...finalData);
     // console.log('json', JSON.stringify(finalData))
 };
-router.get('/', (req, res) => res.render('pages/index'));
+
+router.get('/', async (req, res) => {
+    let adminInfo = await getAdminInfo();
+
+    if (adminInfo.status === 'successful') {
+        let data = adminInfo.data;
+        
+        const existing_admin_username = data?.admin_username;
+        const existing_admin_password = data?.admin_password;
+
+        if (existing_admin_password && existing_admin_username) {
+            return res.redirect('/credentials');
+        } else {
+            return res.render('pages/index');
+        }
+    } else {
+        return res.render('pages/index');
+    }
+});
+
 router.get('/credentials', (req, res) => res.render('pages/credentials'));
 router.get('/airtime', (req, res) => res.render('pages/airtime'));
 router.get('/analytics', (req, res) =>
@@ -73,7 +92,14 @@ router.post('/sign_in', async (req, res) => {
         });
     }
 
-    let data = await getAdminInfo();
+    let adminInfo = await getAdminInfo();
+
+    if (adminInfo.status === 'successful') {
+        let data = adminInfo.data;
+
+        const existing_admin_username = data?.admin_username;
+        const existing_admin_password = data?.admin_password;
+    }
 
     return res.json({
         admin_username,
