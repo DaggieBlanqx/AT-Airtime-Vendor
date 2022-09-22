@@ -1,1 +1,42 @@
-[]
+[
+    {
+    "errorMessage": "None",
+    "numSent": 1,
+    "responses": [
+        {
+        "amount": "KES 5.0000",
+        "discount": "KES 0.2000",
+        "errorMessage": "None",
+        "phoneNumber": "+254705212848",
+        "requestId": "ATQid_78b2a8f5a1efe40a08f61993db96bf71",
+        "status": "Sent"
+        },
+        {
+            "amount": "KES 6.0000",
+            "discount": "KES 0.3000",
+            "errorMessage": "None",
+            "phoneNumber": "+254714800654",
+            "requestId": "ATQid_78b2a8f5a1efe40a08f61993db96bf71",
+            "status": "Sent"
+        }
+    ],
+    "totalAmount": "KES 10.0000",
+    "totalDiscount": "KES 0.4000"
+    },
+    {
+    "errorMessage": "None",
+    "numSent": 1,
+    "responses": [
+        {
+        "amount": "KES 5.0000",
+        "discount": "KES 0.2000",
+        "errorMessage": "None",
+        "phoneNumber": "+254705212849",
+        "requestId": "ATQid_78b2a8f5a1efe40a08f61993db96bf71",
+        "status": "Sent"
+        }
+    ],
+    "totalAmount": "KES 10.0000",
+    "totalDiscount": "KES 0.4000"
+    }
+]
