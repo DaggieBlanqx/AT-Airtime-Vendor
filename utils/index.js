@@ -18,10 +18,12 @@ const sendAirtime = ({
     currencyCode,
 }) => {
     return new Promise((resolve, reject) => {
-        const AT_Airtime = AfricasTalking({
+        const credentials = {
             apiKey: apiKey || process.env.apiKey,
             username: username || process.env.username,
-        }).AIRTIME;
+        };
+        console.log({credentials});
+        const AT_Airtime = AfricasTalking(credentials).AIRTIME;
 
         const recipients = phoneNumbers.map((phoneNumber) => {
             return {

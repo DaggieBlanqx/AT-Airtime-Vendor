@@ -1,6 +1,7 @@
 {
   "WEB_APP": {
     "admin_username": "admin",
-    "admin_password": "12345"
+    "admin_password": "12345",
+    
   }
 }
