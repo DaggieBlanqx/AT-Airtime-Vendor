@@ -12,50 +12,74 @@ const {
     createAirtimeLogs,
     getAdminInfo,
 } = require('../utils/index');
-let analyticsInfo = ()=> {
+let analyticsAirtime = () => {
     // console.log(data);
     let dataResult = [];
-    data.map(element => {
+    data.map((element) => {
         let fragData = element.responses;
         let numbSent = element.numSent;
-        if( numbSent !== 0) {
-
+        if (numbSent !== 0) {
             let result = fragData.map((el) => {
-                let elem = {...el}
+                let elem = { ...el };
                 dataResult.push(elem);
             });
-            
         } else {
             return {};
         }
     });
     return dataResult;
-}
+};
 
-router.get('/', async (req, res) => {
-    let adminInfo = await getAdminInfo();
-
-    if (adminInfo.status === 'successful') {
-        let data = adminInfo.data;
-
-        const existing_admin_username = data?.admin_username;
-        const existing_admin_password = data?.admin_password;
-
-        if (existing_admin_password && existing_admin_username) {
-            return res.redirect('/credentials');
+let analyticsSms = () => {
+    // console.log(data);
+    let dataResult = [];
+    data.map((element) => {
+        let fragData = element.responses;
+        let numbSent = element.numSent;
+        if (numbSent !== 0) {
+            let result = fragData.map((el) => {
+                let elem = { ...el };
+                dataResult.push(elem);
+            });
         } else {
-            return res.render('pages/index');
+            return {};
         }
-    } else {
-        return res.render('pages/index');
-    }
-});
+    });
+    return dataResult;
+};
 
+// router.get('/', async (req, res) => {
+//     let adminInfo = await getAdminInfo();
+
+//     if (adminInfo.status === 'successful') {
+//         let data = adminInfo.data;
+
+//         const existing_admin_username = data?.admin_username;
+//         const existing_admin_password = data?.admin_password;
+
+//         if (existing_admin_password && existing_admin_username) {
+//             return res.redirect('/credentials');
+//         } else {
+//             return res.render('pages/index');
+//         }
+//     } else {
+//         return res.render('pages/index');
+//     }
+// });
+
+router.get('/', (req, res) => res.render('pages/index'));
+router.get('/signup', (req, res) => res.render('pages/signup'));
 router.get('/credentials', (req, res) => res.render('pages/credentials'));
 router.get('/airtime', (req, res) => res.render('pages/airtime'));
-router.get('/analytics', (req, res) =>
-    res.render('pages/analytics', {
-        responseData: analyticsInfo(),
+router.get('/sms', (req, res) => res.render('pages/sms'));
+router.get('/aitimeAnalytics', (req, res) =>
+    res.render('pages/airtimeAnalytics', {
+        responseData: analyticsAirtime(),
+    })
+);
+router.get('/smsAnalytics', (req, res) =>
+    res.render('pages/smsAnalytics', {
+        responseData: analyticsSms(),
     })
 );
 

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<%- include ("../partials/header.ejs") %>
+	</head>
+	<body>
+	<div class="jumbotron text-center">
+	<div class="container">
+		<a href="/" class="lang-logo">
+			<img src="atlogo.jpg">
+		  </a>
+		  <h2>AT Vendor</h2>
+		<form method="POST" action="/sign_up">
+		<div class="form-group row">
+			<div class="col-sm-3">
+				<label for="email">Email</label>
+			</div>
+			<div class="col-sm-6">
+			<input type="text" class="form-control" id="email" aria-describedby="email" placeholder="Enter email" name="email">
+			</div>
+		</div>
+		<div class="form-group row">
+			<div class="col-sm-3">
+				<label for="phoneNumber">Phone Number</label>
+			</div>
+			<div class="col-sm-6">
+			<input type="text" class="form-control" id="phoneNumber" aria-describedby="phoneNumber" placeholder="Enter phoneNumber" name="phoneNumber">
+			</div>
+		</div>
+		<div class="form-group row">
+			<div class="col-sm-3">
+				<label for="country">Country</label>
+			</div>
+			<div class="col-sm-6">
+				<select name="country" class="form-control">
+					<option value="Rwanda" selected>Rwanda</option>
+					<option value="Uganda">Uganda</option>
+					<option value="Tanzania">Tanzania</option>
+					<option value="Nigeria">Nigeria</option>
+				</select>
+				
+			</div>
+		</div>
+		<div class="form-group row">
+			<div class="col-sm-3">
+
+				<label for="password">Password</label>
+			</div>
+			<div class="col-sm-6">
+
+				<input type="password" class="form-control" id="password" placeholder="Enter Password" name="password">
+			</div>
+		</div>
+		<div class="btn-div">
+			<button type="submit" class="btn btn-primary">Submit</button>
+		</div>
+		</form>
+		<div class="col-sm-12">
+			<Span class="text-sign">
+				Already registered?
+			  <a class="nav-link" href="/"><span ></span> Sign In</a>
+			</Span>
+		  </div>
+	</div>
+	</div>
+	</body>
+</html>
