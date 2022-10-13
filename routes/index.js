@@ -286,11 +286,12 @@ router.get('/smsAnalytics', customerOnly, async (req, res) => {
 
     var dataOut = [];
 
-    const smsAnalytics = await _Airtime.getAll();
+    const smsAnalytics = await _Sms.getAll();
 
     if (smsAnalytics.status === 'success') {
         dataOut = smsAnalytics.data;
     }
+
 
     res.render('pages/smsAnalytics', {
         responseData: dataOut,
