@@ -6,7 +6,14 @@
  -->
 A super simple way to start vending Airtime using AfricasTalking API in 15seconds.
 
-1. ## Running Locally
+
+##  STEP 1: Sign up at https://africastalking.com
+  - Create a team, and an app inside it.
+  - Get the app username and it's API key.
+
+
+
+##  STEP 2: Running Locally
  -   Make sure you have [Node.js](http://nodejs.org/) and the [Heroku CLI](https://cli.heroku.com/) installed.
  -   Have mongo DB, and add the mongoDB connection url in the ``config/default.json`` file, at ``mongoDBUri``
 ```sh
@@ -17,7 +24,7 @@ $ npm start
 ```
 
 Your app should now be running on [localhost:5500](http://localhost:5500/) or on your preferred port
-
+<!-- 
 2. ## Deploying to Heroku
 
 ```
@@ -26,7 +33,7 @@ $ git push heroku main
 $ heroku open
 ```
 
-or
+or -->
 
 <!-- <a href="https://heroku.com/deploy?template=https://github.com/DaggieBlanqx/AT-Airtime-Vendor">
   <img src="https://www.herokucdn.com/deploy/button.svg" alt="Deploy">
