@@ -405,11 +405,4 @@ router.post('/send_sms', customerOnly, needsATcredentials, async (req, res) => {
     }
 });
 
-router.get('/sales', (req, res) => {
-    res.json({
-        status: 'succcessful',
-        data: {},
-    });
-});
-
 module.exports = router;
