@@ -1,14 +1,14 @@
 # AT-Airtime-Vendor
 
-<a href="https://heroku.com/deploy?template=https://github.com/DaggieBlanqx/AT-Airtime-Vendor">
+<!-- <a href="https://heroku.com/deploy?template=https://github.com/DaggieBlanqx/AT-Airtime-Vendor">
   <img src="https://www.herokucdn.com/deploy/button.svg" alt="Deploy">
 </a>
-
+ -->
 A super simple way to start vending Airtime using AfricasTalking API in 15seconds.
 
 1. ## Running Locally
-    Make sure you have [Node.js](http://nodejs.org/) and the [Heroku CLI](https://cli.heroku.com/) installed.
-
+ -   Make sure you have [Node.js](http://nodejs.org/) and the [Heroku CLI](https://cli.heroku.com/) installed.
+ -   Have mongo DB, and add the mongoDB connection url in the ``config/default.json`` file, at ``mongoDBUri``
 ```sh
 $ git clone https://github.com/DaggieBlanqx/AT-Airtime-Vendor # or clone your own fork
 $ cd AT-Airtime-Vendor
@@ -28,9 +28,9 @@ $ heroku open
 
 or
 
-<a href="https://heroku.com/deploy?template=https://github.com/DaggieBlanqx/AT-Airtime-Vendor">
+<!-- <a href="https://heroku.com/deploy?template=https://github.com/DaggieBlanqx/AT-Airtime-Vendor">
   <img src="https://www.herokucdn.com/deploy/button.svg" alt="Deploy">
-</a>
+</a> -->
 
 ## Documentation
 
