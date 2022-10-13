@@ -3,7 +3,7 @@ const express = require('express');
 const { phone } = require('phone');
 
 const router = express.Router();
-const data = require('../data_store/logs.json');
+const { adminData, smsData, airtimeData } = require('../data_store/logs.json');
 
 const Credential = require('../controllers/Credential.js');
 const _Credential = new Credential();
@@ -21,7 +21,7 @@ const {
 let analyticsAirtime = () => {
     // console.log(data);
     let dataResult = [];
-    data.map((element) => {
+    airtimeData.map((element) => {
         let fragData = element.responses;
         let numbSent = element.numSent;
         if (numbSent !== 0) {
@@ -39,7 +39,7 @@ let analyticsAirtime = () => {
 let analyticsSms = () => {
     // console.log(data);
     let dataResult = [];
-    data.map((element) => {
+    smsData.map((element) => {
         let fragData = element.responses;
         let numbSent = element.numSent;
         if (numbSent !== 0) {
@@ -57,7 +57,7 @@ let analyticsSms = () => {
 let analyticsAdmin = () => {
     // console.log(data);
     let dataResult = [];
-    data.map((element) => {
+    adminData.map((element) => {
         let fragData = element.responses;
         let numbSent = element.numSent;
         if (numbSent !== 0) {
@@ -96,8 +96,9 @@ router.get('/signup', (req, res) => res.render('pages/signup'));
 router.get('/credentials', (req, res) => res.render('pages/credentials'));
 router.get('/airtime', (req, res) => res.render('pages/airtime'));
 router.get('/sms', (req, res) => res.render('pages/sms'));
-router.get('/admin', (req, res) => res.render('pages/admin', {
-    responseData: analyticsAdmin(),
+router.get('/admin', (req, res) =>
+    res.render('pages/admin', {
+        responseData: analyticsAdmin(),
     })
 );
 router.get('/aitimeAnalytics', (req, res) =>
