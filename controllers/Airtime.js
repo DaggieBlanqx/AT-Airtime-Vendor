@@ -57,8 +57,32 @@ Airtime.prototype.getById = function ({ AirtimeId }) {
 Airtime.prototype.getAll = function () {
     return new Promise((resolve, reject) => {
         _Airtime.find({}, (err, docs) => {
-            err ? reject(err) : resolve(docs);
+            err
+                ? reject(err)
+                : resolve({
+                      status: 'success',
+                      data: docs,
+                  });
         });
+    });
+};
+
+Airtime.prototype.getAll_Detailed = function () {
+    return new Promise((resolve, reject) => {
+        _Airtime
+            .find({})
+            .populate('user')
+            .exec(function (err, docs) {
+                if (err) {
+                    reject({ ...err });
+                } else {
+                    resolve({
+                        status: 'success',
+                        data: docs,
+                    });
+                }
+                // do something
+            });
     });
 };
 

@@ -142,17 +142,24 @@ router.get('/_admin', adminOnly, async (req, res) => {
 });
 
 router.get('/admin', adminOnly, async (req, res) => {
+    // return    res.render('pages/admin',{responseData:[]})
+
     const partitionedSMS = {};
     const partitionedAirtime = {};
     const errors = [];
 
-    const allSMS = await _Sms.getAll();
-    const allAirtime = await _Airtime.getAll();
+    const combined = {};
+
+    const allSMS = await _Sms.getAll_Detailed();
+    const allAirtime = await _Airtime.getAll_Detailed();
 
     if (allSMS.status === 'success') {
         allSMS.data.map((d) => {
             let _userId = d.user._id.toString();
-            let newSMS = d.cost;
+            let newSMS = {
+                ...d._doc,
+                cost: d.cost,
+            };
 
             if (partitionedSMS[_userId]) {
                 partitionedSMS[_userId] = [...partitionedSMS[_userId], newSMS];
@@ -166,24 +173,94 @@ router.get('/admin', adminOnly, async (req, res) => {
         });
     }
 
-    if (allSMS.status === 'success') {
-        allSMS.data.map((d) => {
+    if (allAirtime.status === 'success') {
+        allAirtime.data.map((d) => {
             let _userId = d.user._id.toString();
-            let newSMS = d.cost;
+            let newAirtime = {
+                amount: d.amount,
+                ...d._doc,
+            };
 
-            if (partitionedSMS[_userId]) {
-                partitionedSMS[_userId] = [...partitionedSMS[_userId], newSMS];
+            if (partitionedAirtime[_userId]) {
+                partitionedAirtime[_userId] = [
+                    ...partitionedAirtime[_userId],
+                    newAirtime,
+                ];
             } else {
-                partitionedSMS[_userId] = [newSMS];
+                partitionedAirtime[_userId] = [newAirtime];
             }
         });
     } else {
         errors.push({
-            msg: 'Could not get the SMSes',
+            msg: 'Could not get the Airtime list',
         });
     }
+    // Number(t.split(" ")[1])
+    /*
+    Object.keys(partitionedSMS).map((p) => {
+        let currency = '';
+        let sms_items = Object.values(partitionedSMS[p]);
+    
+        let numberOfSMS = sms_items.length;
+        let cost = sms_items
+            .map((_item) => {
+                currency = _item.cost.split(' ')[0];
+    
+                // Id	Phone Number	email	Country	Sms	Airtime
+    
+                return Number(_item.cost.split(' ')[1]);
+            })
+            .reduce((a, b) => a + b);
+        let user = sms_items[0].user;
+        console.log({ p, cost, user, numberOfSMS });
+        // console.log({p:})
+    });
+    */
 
-    res.json({ partitionedSMS });
+    Object.keys(partitionedSMS).map((p) => {
+        let currency = '';
+        let sms_items = Object.values(partitionedSMS[p]);
+        let airtime_items = Object.values(partitionedAirtime[p]);
+
+        let numberOfSMS = sms_items.length;
+        let numberOfAirtime = airtime_items.length;
+
+        let sms_cost = sms_items
+            .map((_item) => {
+                currency = _item.cost.split(' ')[0];
+
+                // Id	Phone Number	email	Country	Sms	Airtime
+
+                return Number(_item.cost.split(' ')[1]);
+            })
+            .reduce((a, b) => a + b);
+
+        let airtime_cost = airtime_items
+            .map((_item) => {
+                currency = _item.amount.split(' ')[0];
+
+                // Id	Phone Number	email	Country	Sms	Airtime
+
+                return Number(_item.amount.split(' ')[1]);
+            })
+            .reduce((a, b) => a + b);
+
+        let user = sms_items[0].user;
+        console.log({
+            p,
+            sms_cost,
+            user,
+            numberOfSMS,
+            numberOfAirtime,
+            airtime_cost,
+        });
+        // console.log({p:})
+    });
+
+    res.json({
+        partitionedSMS,
+        partitionedAirtime,
+    });
 });
 
 router.get('/aitimeAnalytics', customerOnly, async (req, res) => {
