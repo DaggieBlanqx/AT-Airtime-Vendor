@@ -34,10 +34,22 @@ User.prototype.create = function ({ dataIn }) {
 
             __User.save((err, docs) => {
                 if (err) {
-                    reject({
-                        status: 'failed',
-                        ...err,
-                    });
+                    const errMessage = err.message;
+                    if (
+                        errMessage.includes('email') &&
+                        errMessage.includes('unique')
+                    ) {
+                        resolve({
+                            status: 'failed',
+                            message:
+                                'Email already registered! Sign in with it, or contact admin',
+                        });
+                    } else {
+                        reject({
+                            status: 'failed',
+                            ...err,
+                        });
+                    }
                 } else {
                     resolve({
                         status: 'success',
@@ -60,7 +72,6 @@ User.prototype.getById = function ({ UserId }) {
 User.prototype.getByEmail = function ({ email }) {
     return new Promise((resolve, reject) => {
         _User.findOne({ email: email }, function (err, docs) {
-            console.log({ err, docs });
             if (err) {
                 reject(err);
             } else {

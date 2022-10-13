@@ -7,10 +7,6 @@ const aggregatePaginate = require('mongoose-aggregate-paginate-v2');
 const uniqueValidator = require('mongoose-unique-validator');
 
 const UserSchema = new Schema({
-    credential: {
-        type: ObjectId,
-        ref: 'Credential',
-    },
     country: { type: String },
     phoneNumber: { type: String },
     email: {

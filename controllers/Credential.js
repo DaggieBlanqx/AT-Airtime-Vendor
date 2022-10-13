@@ -54,6 +54,28 @@ Credential.prototype.getById = function (CredentialId) {
     });
 };
 
+Credential.prototype.getByOwner = function ({ ownedBy }) {
+    return new Promise((resolve, reject) => {
+        _Credential.findOne({ ownedBy: ownedBy }, function (err, docs) {
+            if (err) {
+                reject(err);
+            } else {
+                if (docs) {
+                    resolve({
+                        status: 'success',
+                        ...docs._doc,
+                    });
+                } else {
+                    resolve({
+                        status: 'failed',
+                        msg: 'owner not found',
+                    });
+                }
+            }
+        });
+    });
+};
+
 Credential.prototype.getAll = function () {
     return new Promise((resolve, reject) => {
         _Credential.find({}, (err, docs) => {

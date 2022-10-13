@@ -4,6 +4,8 @@ const { validate, buildAndValidateSchema } = require('./validation.js');
 
 const User = require('../controllers/User.js');
 var _User = new User();
+const Credential = require('../controllers/Credential.js');
+const _Credential = new Credential();
 
 const preFetchAllUsers = async (req, res, next) => {
     try {
@@ -60,10 +62,42 @@ const customerOnly = async (req, res, next) => {
     }
 };
 
+const shouldNotBeLoggedIn = async (req, res, next) => {
+    const loggedInUser = req.session.user;
+    if (loggedInUser) {
+        return res.redirect('/');
+    } else {
+        next();
+    }
+};
+
+const needsATcredentials = async (req, res, next) => {
+    const loggedInUser = req.session.user;
+    if (loggedInUser) {
+        const output = await _Credential.getByOwner({
+            ownedBy: loggedInUser._id,
+        });
+
+        if (output.status === 'success') {
+            next();
+        } else {
+            return res.render('pages/credentials', {
+                warningMessage: `You need to set your Africa's Talking API keys first!`,
+            });
+        }
+    } else {
+        return res.render('pages/credentials', {
+            warningMessage: `You need to set your Africa's Talking API keys first!`,
+        });
+    }
+};
+
 module.exports = {
     logTraffic,
     validate,
     buildAndValidateSchema,
     customerOnly,
     adminOnly,
+    shouldNotBeLoggedIn,
+    needsATcredentials,
 };

@@ -10,6 +10,15 @@
 			<img src="atlogo.jpg">
 		  </a>
 		  <h2>AT Vendor</h2>
+		  <%
+		  if(warningMessage){
+		%>
+		  <div class="alert alert-danger" role="alert">
+			<%= warningMessage %>
+		  </div>
+		<%
+		  }
+		%>
 		<form method="POST" action="/sign_up">
 		<div class="form-group row">
 			<div class="col-sm-3">

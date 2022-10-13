@@ -1,7 +1,12 @@
 'use strict';
 const express = require('express');
 const { phone } = require('phone');
-const { customerOnly, adminOnly } = require('../middlewares/index');
+const {
+    customerOnly,
+    adminOnly,
+    shouldNotBeLoggedIn,
+    needsATcredentials,
+} = require('../middlewares/index');
 const router = express.Router();
 // const { adminData, smsData, airtimeData } = require('../data_store/logs.json');
 
@@ -76,25 +81,6 @@ let analyticsAdmin = () => {
     return dataResult;
 };
 
-// router.get('/', async (req, res) => {
-//     let adminInfo = await getAdminInfo();
-
-//     if (adminInfo.status === 'successful') {
-//         let data = adminInfo.data;
-
-//         const existing_admin_username = data?.admin_username;
-//         const existing_admin_password = data?.admin_password;
-
-//         if (existing_admin_password && existing_admin_username) {
-//             return res.redirect('/credentials');
-//         } else {
-//             return res.render('pages/index');
-//         }
-//     } else {
-//         return res.render('pages/index');
-//     }
-// });
-
 router.get('/', (req, res) => {
     const loggedInUser = req.session.user;
     if (loggedInUser) {
@@ -109,12 +95,18 @@ router.use('/sign_out', (req, res) => {
     return res.redirect('/');
 });
 
-router.get('/signup', (req, res) => res.render('pages/signup'));
-router.get('/credentials', customerOnly, (req, res) =>
-    res.render('pages/credentials')
+router.get('/signup', shouldNotBeLoggedIn, (req, res) =>
+    res.render('pages/signup', { warningMessage: null })
 );
-router.get('/airtime', customerOnly, (req, res) => res.render('pages/airtime'));
-router.get('/sms', customerOnly, (req, res) => res.render('pages/sms'));
+router.get('/credentials', customerOnly, (req, res) =>
+    res.render('pages/credentials', { warningMessage: null })
+);
+router.get('/airtime', customerOnly, needsATcredentials, (req, res) =>
+    res.render('pages/airtime')
+);
+router.get('/sms', customerOnly, needsATcredentials, (req, res) =>
+    res.render('pages/sms')
+);
 router.get('/admin', adminOnly, (req, res) =>
     res.render('pages/admin', {
         responseData: analyticsAdmin(),
@@ -133,55 +125,27 @@ router.get('/smsAnalytics', customerOnly, (req, res) =>
 
 router.post('/sign_up', async (req, res) => {
     //receive Admin username and password -> then save it
-    const admin_username = req.body.admin_username;
-    const admin_password = req.body.admin_password;
+    const country = req.body.country;
+    const password = req.body.password;
+    const email = req.body.email;
+    const phoneNumber = req.body.phoneNumber;
+    const dataIn = {
+        country,
+        password,
+        email,
+        phoneNumber,
+    };
 
-    const output = await createBusinessOwnerFile({
-        admin_username,
-        admin_password,
-    });
+    const output = await _User.create({ dataIn });
 
-    if (output.status === 'successful') {
-        req.session.user = {
-            admin_username,
-        };
-        // good
-        return res.redirect('/credentials');
+    if (output.status === 'success') {
+        return res.redirect('/');
     } else {
-        //bad
-        return res.status(500).json(output);
-    }
-});
-/*
-router.post('/sign_in', async (req, res) => {
-    console.log({body: req.body})
-    //receive Admin username and password
-    const admin_username = req.body.admin_username;
-    const admin_password = req.body.admin_password;
-
-    if (!admin_password || !admin_username) {
-        return res.status(400).json({
-            status: 'failed',
-            message: 'Invalid username or password',
+        return res.render('pages/signup', {
+            warningMessage: output.message || 'Oops! Unexpected error',
         });
     }
-
-    let adminInfo = await getAdminInfo();
-
-    if (adminInfo.status === 'successful') {
-        let data = adminInfo.data;
-
-        const existing_admin_username = data?.admin_username;
-        const existing_admin_password = data?.admin_password;
-    }
-
-    return res.json({
-        admin_username,
-        admin_password,
-        data,
-    });
 });
-*/
 
 router.post('/sign_in', async (req, res) => {
     const incomingPassword = req.body.password;
@@ -212,8 +176,9 @@ router.post('/sign_in', async (req, res) => {
         });
     }
 });
-
+/*
 router.post('/add_at_credentials', async (req, res) => {
+    console.log({ body: req.body})
     //receive API Keys and username
     const apiKey = req.body.apiKey;
     const username = req.body.username;
@@ -238,7 +203,33 @@ router.post('/add_at_credentials', async (req, res) => {
         return res.status(500).json(output);
     }
 });
+*/
 
+router.post('/add_at_credentials', customerOnly, async (req, res) => {
+    //receive API Keys and username
+    const apiKey = req.body.apiKey;
+    const username = req.body.username;
+    const userId = req.session.user._id;
+    const dataIn = {
+        apiKey,
+        username,
+        ownedBy: userId,
+    };
+
+    console.log({ dataIn });
+
+    const output = await _Credential.create(dataIn);
+
+    console.log({ output });
+
+    if (output.status === 'success') {
+        //good
+        return res.redirect('/airtime');
+    } else {
+        //bad
+        return res.status(500).json(output);
+    }
+});
 router.post('/send_airtime', async (req, res) => {
     try {
         //receive phone numbers and amount
