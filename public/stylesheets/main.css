@@ -68,6 +68,10 @@
     border-bottom: none;
 }
 
+.navbar-inverse .navbar-nav #signOut-id {
+    display: flex;
+    text-align: right;
+}
 .navbar-inverse .navbar-nav > li > a {
     color: white;
 }
