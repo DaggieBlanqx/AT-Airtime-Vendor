@@ -10,7 +10,16 @@
       <img src="atlogo.jpg">
     </a>
     <h2>AT Vendor</h2>
-    <%- include ("../partials/nav.ejs") %> 
+    <%- include ("../partials/nav.ejs") %>
+    <%
+    if(warningMessage){
+  %>
+    <div class="alert alert-danger" role="alert">
+    <%= warningMessage %>
+    </div>
+  <%
+    }
+  %>
     <form method="POST" action="/send_airtime">
       <h6>Add a number starting with +254 or +250 separated by comma(,)</h6>
       <div class="form-group row">

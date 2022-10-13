@@ -1,5 +1,4 @@
 'use strict';
-require('dotenv').config();
 const Mongoose = require('mongoose');
 const Schema = Mongoose.Schema;
 const ObjectId = Schema.Types.ObjectId;
@@ -11,9 +10,12 @@ const AirtimeSchema = new Schema({
         type: ObjectId,
         ref: 'User',
     },
-    cost: { type: Number },
+    amount: { type: String },
+    discount: { type: String },
+    phoneNumber: { type: String },
+    requestId: { type: String },
+    status: { type: String },
     sentOn: { type: Date, default: new Date() },
-    payload: { type: String },
     metadata: { type: Schema.Types.Mixed },
 });
 

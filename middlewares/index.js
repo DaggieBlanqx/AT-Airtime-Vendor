@@ -83,11 +83,13 @@ const needsATcredentials = async (req, res, next) => {
         } else {
             return res.render('pages/credentials', {
                 warningMessage: `You need to set your Africa's Talking API keys first!`,
+                overwriteMessage: null,
             });
         }
     } else {
         return res.render('pages/credentials', {
             warningMessage: `You need to set your Africa's Talking API keys first!`,
+            overwriteMessage: null,
         });
     }
 };

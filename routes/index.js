@@ -20,12 +20,19 @@ const _Credential = new Credential();
 const User = require('../controllers/User.js');
 const _User = new User();
 
+const Airtime = require('../controllers/Airtime.js');
+const _Airtime = new Airtime();
+
+const Sms = require('../controllers/Sms.js');
+const _Sms = new Sms();
+
 const {
     sendAirtime,
     doesFileExist,
     createBusinessOwnerFile,
     createAirtimeLogs,
     getAdminInfo,
+    sendSMS,
 } = require('../utils/index');
 let analyticsAirtime = () => {
     // console.log(data);
@@ -98,11 +105,28 @@ router.use('/sign_out', (req, res) => {
 router.get('/signup', shouldNotBeLoggedIn, (req, res) =>
     res.render('pages/signup', { warningMessage: null })
 );
-router.get('/credentials', customerOnly, (req, res) =>
-    res.render('pages/credentials', { warningMessage: null })
-);
+router.get('/credentials', customerOnly, async (req, res) => {
+    const loggedInUser = req.session.user;
+    if (loggedInUser) {
+        const output = await _Credential.getByOwner({
+            ownedBy: loggedInUser._id,
+        });
+        if (output.status === 'success') {
+            res.render('pages/credentials', {
+                warningMessage: null,
+                overwriteMessage:
+                    'You have already set your apiKey and username. By submiting this form, you will be overwritting your previous settings.',
+            });
+        }
+    }
+
+    return res.render('pages/credentials', {
+        warningMessage: null,
+        overwriteMessage: null,
+    });
+});
 router.get('/airtime', customerOnly, needsATcredentials, (req, res) =>
-    res.render('pages/airtime')
+    res.render('pages/airtime', { warningMessage: null })
 );
 router.get('/sms', customerOnly, needsATcredentials, (req, res) =>
     res.render('pages/sms')
@@ -112,16 +136,19 @@ router.get('/admin', adminOnly, (req, res) =>
         responseData: analyticsAdmin(),
     })
 );
-router.get('/aitimeAnalytics', customerOnly, (req, res) =>
+router.get('/aitimeAnalytics', customerOnly, async (req, res) => {
+    const airtimeAnalytics = await _Airtime.getAll();
     res.render('pages/airtimeAnalytics', {
-        responseData: analyticsAirtime(),
-    })
-);
-router.get('/smsAnalytics', customerOnly, (req, res) =>
+        responseData: airtimeAnalytics,
+    });
+});
+
+router.get('/smsAnalytics', customerOnly, async (req, res) => {
+    const smsAnalytics = await _Sms.getAll();
     res.render('pages/smsAnalytics', {
-        responseData: analyticsSms(),
-    })
-);
+        responseData: smsAnalytics,
+    });
+});
 
 router.post('/sign_up', async (req, res) => {
     //receive Admin username and password -> then save it
@@ -176,35 +203,6 @@ router.post('/sign_in', async (req, res) => {
         });
     }
 });
-/*
-router.post('/add_at_credentials', async (req, res) => {
-    console.log({ body: req.body})
-    //receive API Keys and username
-    const apiKey = req.body.apiKey;
-    const username = req.body.username;
-
-    const output = await createBusinessOwnerFile({
-        apiKey,
-        username,
-    });
-
-    console.log({ output });
-
-    if (output.status === 'successful') {
-        //good
-        return res.redirect('/airtime');
-        // return res.json({
-        //     admin_username,
-        //     admin_password,
-        //     output,
-        // });
-    } else {
-        //bad
-        return res.status(500).json(output);
-    }
-});
-*/
-
 router.post('/add_at_credentials', customerOnly, async (req, res) => {
     //receive API Keys and username
     const apiKey = req.body.apiKey;
@@ -216,28 +214,121 @@ router.post('/add_at_credentials', customerOnly, async (req, res) => {
         ownedBy: userId,
     };
 
-    console.log({ dataIn });
-
-    const output = await _Credential.create(dataIn);
-
-    console.log({ output });
+    const output = await _Credential.update({ dataIn });
 
     if (output.status === 'success') {
         //good
         return res.redirect('/airtime');
     } else {
         //bad
-        return res.status(500).json(output);
+        return res.render('pages/credentials', {
+            warningMessage: 'Oops! An issue occurred!',
+            overwriteMessage: null,
+        });
     }
 });
-router.post('/send_airtime', async (req, res) => {
+router.post(
+    '/send_airtime',
+    customerOnly,
+    needsATcredentials,
+    async (req, res) => {
+        try {
+            //receive phone numbers and amount
+            let errors = [];
+            let phoneNumbers = [];
+
+            let _phoneNumbers = req.body.phoneNumbers;
+            let amount = req.body.amount;
+            const userId = req.session.user._id;
+
+            let recipients = _phoneNumbers?.split(',');
+
+            recipients.map((rp) => {
+                let phoneRegex = /^(\+[1-9]{1,3})?\d{4,}$/;
+
+                if (phoneRegex.test(rp)) {
+                    phoneNumbers.push(rp);
+                } else {
+                    errors.push(`Invalid phone: ${rp}`);
+                }
+            });
+
+            if (errors.length) {
+                return res.json({
+                    errors,
+                });
+            }
+            const output = await _Credential.getByOwner({
+                ownedBy: req.session.user._id,
+            });
+
+            console.log({ output });
+
+            const username = output.username;
+            const apiKey = output.apiKey;
+
+            const airtimeResult = await sendAirtime({
+                apiKey,
+                username,
+                phoneNumbers,
+                amount,
+            });
+            if (airtimeResult.status === 'successful') {
+                // write to file
+                console.log({ airtimeResult });
+
+                let allResponses = airtimeResult.result.responses || [];
+
+                const bulkDataIn = allResponses.map((rsp) => {
+                    let dataIn = {
+                        ...rsp,
+                        user: userId,
+                        metadata: rsp,
+                    };
+                    return _Airtime.create(dataIn);
+                });
+
+                return Promise.all(bulkDataIn)
+                    .then((dataOut) => {
+                        res.redirect('/aitimeAnalytics');
+                    })
+                    .catch((dataOutError) => {
+                        console.error({ dataOutError });
+
+                        res.redirect('/aitimeAnalytics');
+                    });
+            } else {
+                console.log({ 'bad airtimeResult': airtimeResult });
+                return res.render('pages/airtime', {
+                    warningMessage:
+                        'Unfortunately, we could not complete this request!',
+                });
+            }
+        } catch (err) {
+            if (err.message && err.message.includes('duplicate')) {
+                return res.render('pages/airtime', {
+                    warningMessage:
+                        '😁Take a 5minute break! You have just sent a similar amount to the same recipient(s). ',
+                });
+            } else {
+                return res.render('pages/airtime', {
+                    warningMessage:
+                        err.message || 'Oops! We did not see this coming',
+                });
+            }
+        }
+    }
+);
+
+router.post('/send_sms', customerOnly, needsATcredentials, async (req, res) => {
     try {
         //receive phone numbers and amount
         let errors = [];
         let phoneNumbers = [];
 
         let _phoneNumbers = req.body.phoneNumbers;
-        let amount = req.body.amount;
+        let message = req.body.message;
+        const userId = req.session.user._id;
 
         let recipients = _phoneNumbers?.split(',');
 
@@ -256,31 +347,62 @@ router.post('/send_airtime', async (req, res) => {
                 errors,
             });
         }
+        const output = await _Credential.getByOwner({
+            ownedBy: req.session.user._id,
+        });
 
-        const airtimeResult = await sendAirtime({ phoneNumbers, amount });
-        if (airtimeResult.status === 'successful') {
+        console.log({ output });
+
+        const username = output.username;
+        const apiKey = output.apiKey;
+
+        const smsResult = await sendSMS({
+            apiKey,
+            username,
+            phoneNumbers,
+            message,
+        });
+        if (smsResult.status === 'successful') {
             // write to file
-            console.log({ airtimeResult });
-            let output = await createAirtimeLogs({
-                singleTransaction: airtimeResult.result,
+            console.log({ smsResult });
+
+            const bulkDataIn = smsResult.listOfRecipients.map((rsp) => {
+                let dataIn = {
+                    ...rsp,
+                    user: userId,
+                    metadata: rsp,
+                    phoneNumber: rsp.number,
+                };
+                return _Sms.create(dataIn);
             });
 
-            if (output.status === 'successful') {
-                return res.redirect('/analytics');
-            } else {
-                console.log({ output });
-                return res.redirect('/analytics');
-                return res.json(output);
-            }
+            return Promise.all(bulkDataIn)
+                .then((dataOut) => {
+                    return res.redirect('/smsAnalytics');
+                })
+                .catch((dataOutError) => {
+                    console.error({ dataOutError });
+                    return res.redirect('/smsAnalytics');
+                });
         } else {
-            return res.status(500).json({
-                ...airtimeResult,
+            console.log({ 'bad smsResult': smsResult });
+            return res.render('pages/sms', {
+                warningMessage:
+                    'Unfortunately, we could not complete this request!',
             });
         }
     } catch (err) {
-        return res.status(500).json({
-            ...err,
-        });
+        if (err.message && err.message.includes('duplicate')) {
+            return res.render('pages/sms', {
+                warningMessage:
+                    '😁Take a 5minute break! You have just sent a similar message to the same recipient(s). ',
+            });
+        } else {
+            return res.render('pages/sms', {
+                warningMessage:
+                    err.message || 'Oops! We did not see this coming',
+            });
+        }
     }
 });
 

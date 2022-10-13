@@ -1,5 +1,4 @@
 'use strict';
-require('dotenv').config();
 const Mongoose = require('mongoose');
 const Schema = Mongoose.Schema;
 const ObjectId = Schema.Types.ObjectId;
@@ -11,10 +10,12 @@ const SmsSchema = new Schema({
         type: ObjectId,
         ref: 'User',
     },
-    cost: { type: Number },
+    cost: { type: String },
+    messageId: { type: String },
+    status: { type: String },
     sentOn: { type: Date, default: new Date() },
     message: { type: String },
-    recipient: { type: String },
+    phoneNumber: { type: String },
     metadata: { type: Schema.Types.Mixed },
 });
 

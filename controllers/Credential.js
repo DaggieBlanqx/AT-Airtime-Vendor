@@ -83,5 +83,35 @@ Credential.prototype.getAll = function () {
         });
     });
 };
+Credential.prototype.update = function ({ dataIn }) {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const { ownedBy } = dataIn;
+            const existingEntry = await _Credential.findOne({
+                where: {
+                    ownedBy,
+                },
+            });
+
+            if (existingEntry) {
+                // update the existing metrics
+                const results = await existingEntry.update(dataIn);
+                resolve({
+                    status: 'success',
+                    ...results?.dataValues,
+                });
+            } else {
+                // create a new metrics object
+                const results = await _Credential.create(dataIn);
+                resolve({
+                    status: 'success',
+                    ...results?.dataValues,
+                });
+            }
+        } catch (err) {
+            reject(err);
+        }
+    });
+};
 
 module.exports = Credential;

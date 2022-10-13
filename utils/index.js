@@ -22,7 +22,7 @@ const sendAirtime = ({
             apiKey: apiKey || process.env.apiKey,
             username: username || process.env.username,
         };
-        console.log({ credentials });
+
         const AT_Airtime = AfricasTalking(credentials).AIRTIME;
 
         const recipients = phoneNumbers.map((phoneNumber) => {
@@ -52,6 +52,102 @@ const sendAirtime = ({
                 }
             })
             .catch((error) => {
+                console.error({ error });
+                if (error?.toString()?.includes('status code 401')) {
+                    reject(
+                        FAIL({
+                            message: 'Invalid apiKey and username',
+                        })
+                    );
+                } else {
+                    reject(
+                        FAIL({
+                            ...error,
+                        })
+                    );
+                }
+            });
+    });
+};
+const sendSMS = ({ apiKey, username, phoneNumbers, message }) => {
+    return new Promise((resolve, reject) => {
+        const credentials = {
+            apiKey: apiKey || process.env.apiKey,
+            username: username || process.env.username,
+        };
+
+        const sms = AfricasTalking(credentials).SMS;
+
+        const options = {
+            to: phoneNumbers,
+            message,
+        };
+
+        // sms.send(options)
+        // .then(console.log)
+        // .catch(console.log);
+
+        return sms
+            .send(options)
+            .then((response) => {
+                console.log({ response });
+                const SMSMessageData = response.SMSMessageData || {};
+                const Recipients = SMSMessageData.Recipients || [];
+                if (
+                    SMSMessageData &&
+                    SMSMessageData.Recipients &&
+                    Recipients.length
+                ) {
+                    let listOfRecipients = Recipients.map((rp) => {
+                        return {
+                            ...rp,
+                            message,
+                        };
+                    });
+                    resolve({
+                        status: 'successful',
+                        listOfRecipients,
+                    });
+                } else {
+                    reject({
+                        status: 'failed',
+                        err: {
+                            message: 'Not even one recipient',
+                        },
+                    });
+                }
+
+                // {
+                //     cost: 'KES 0.8000',
+                //     messageId: 'ATXid_8e885fa98e2de776e71231e6e481bdf9',
+                //     messageParts: 1,
+                //     number: '+254705212848',
+                //     status: 'Success',
+                //     statusCode: 101
+                //   }
+                // response: {
+                //     SMSMessageData: {
+                //       Message: 'Sent to 1/1 Total Cost: KES 0.8000',
+                //       Recipients: [Array]
+                //     }
+                //   }
+                // // }
+
+                // if (response.numSent < 1) {
+                //     reject(
+                //         FAIL({
+                //             message: response.errorMessage,
+                //         })
+                //     );
+                // } else {
+                //     resolve({
+                //         status: 'successful',
+                //         result: response,
+                //     });
+                // }
+            })
+            .catch((error) => {
+                console.error({ error });
                 console.error({ error });
                 if (error?.toString()?.includes('status code 401')) {
                     reject(
@@ -305,4 +401,5 @@ module.exports = {
     createAirtimeLogs,
     getAdminInfo,
     readJSONFile,
+    sendSMS,
 };

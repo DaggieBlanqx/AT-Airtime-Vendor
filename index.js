@@ -54,7 +54,7 @@ const main = async () => {
     app.use('*', (req, res, next) => {
         const loggedInUser = req.session.user;
 
-        console.log({ loggedInUser });
+        // console.log({ loggedInUser });
 
         next();
     });
