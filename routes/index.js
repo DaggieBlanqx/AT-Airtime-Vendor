@@ -283,7 +283,6 @@ router.get('/smsAnalytics', customerOnly, async (req, res) => {
     //     responseData: smsAnalytics,
     // });
 
-
     var dataOut = [];
 
     const smsAnalytics = await _Sms.getAll();
@@ -291,7 +290,6 @@ router.get('/smsAnalytics', customerOnly, async (req, res) => {
     if (smsAnalytics.status === 'success') {
         dataOut = smsAnalytics.data;
     }
-
 
     res.render('pages/smsAnalytics', {
         responseData: dataOut,
