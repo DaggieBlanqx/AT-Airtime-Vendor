@@ -6,7 +6,7 @@
     /* overflow: auto; */
 }
 .jumbotron .container {
-    max-width: 60%;
+    max-width: 80%;
 }
 /* .jumbotron table, form {
     margin-top: 15px;
@@ -43,6 +43,14 @@
 }
 .jumbotron h2 {
     color: #0c7441;
+}
+.jumbotron .col-sm-12 {
+    margin-top: 10px;
+    /* text-align: right; */
+}
+.jumbotron .text-sign {
+    font-size: small;
+    color: grey;
 }
 .jumbotron form {
     text-align: right;
