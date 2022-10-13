@@ -8,7 +8,6 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const { v4: uuidv4 } = require('uuid');
 
-// yarn add uuid connect-mongo
 process.env = {
     ...config.get('WEB_APP'),
     ...process.env,

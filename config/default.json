@@ -6,6 +6,10 @@
         "logo": "https://africastalking.com/img/logo_color.svg",
         "username": "",
         "apiKey": "",
-        "PORT": 5500
+        "PORT": 5500,
+        "admin_username": "admin",
+        "admin_password": "12345",
+        "EXPRESS_SESSION_SECRET": "2345678",
+        "mongoDBUri": "mongodb://127.0.0.1:27017/test"
     }
 }
