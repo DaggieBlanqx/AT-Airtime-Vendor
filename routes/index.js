@@ -264,7 +264,7 @@ router.get('/admin', adminOnly, async (req, res) => {
 });
 
 router.get('/aitimeAnalytics', customerOnly, async (req, res) => {
-    const dataOut = [];
+    var dataOut = [];
 
     const airtimeAnalytics = await _Airtime.getAll();
 
@@ -284,7 +284,7 @@ router.get('/smsAnalytics', customerOnly, async (req, res) => {
     // });
 
 
-    const dataOut = [];
+    var dataOut = [];
 
     const smsAnalytics = await _Airtime.getAll();
 
