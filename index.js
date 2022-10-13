@@ -3,8 +3,12 @@ const path = require('path');
 const config = require('config');
 const bodyParser = require('body-parser');
 const session = require('express-session');
+const MongoStore = require('connect-mongo');
 const cors = require('cors');
+const mongoose = require('mongoose');
+const { v4: uuidv4 } = require('uuid');
 
+// yarn add uuid connect-mongo
 process.env = {
     ...config.get('WEB_APP'),
     ...process.env,
@@ -65,10 +69,29 @@ const main = async () => {
         session({
             secret: '1234567890',
             resave: false,
-            saveUninitialized: true,
+            saveUninitialized: false,
             cookie: { secure: true },
         })
     );
+
+    // app.use(session({
+    //     genid: (req) => {
+    //       return uuidv4()
+    //     },
+    //     secret: process.env.EXPRESS_SESSION_SECRET,
+    //     resave: true,
+    //     saveUninitialized: false,
+    //     cookie: { maxAge: 24 * 60 * 60 * 1000 },
+    //     store: MongoStore.create({
+    //       client: mongoose.connection.getClient(),
+    //       dbName: process.env.MONGO_DB_NAME,
+    //       collectionName: "sessions",
+    //       stringify: false,
+    //       autoRemove: "interval",
+    //       autoRemoveInterval: 1
+    //       })
+    //     })
+    //   );
 
     app.use('*', (req, res, next) => {
         console.log({
@@ -81,4 +104,29 @@ const main = async () => {
         console.log(`Listening on ${process.env.PORT}`)
     );
 };
-main();
+
+/*
+START OF DATABASE LAUNCH ACTIONS
+*/
+
+//initialize the use of native Node Promise with mongoose
+mongoose.Promise = global.Promise;
+
+//create a connection to mongoDB
+const mongoOptions = {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+};
+const mongodbUri = process.env.mongoDBUri;
+mongoose.connect(mongodbUri, mongoOptions);
+const conn = mongoose.connection;
+
+conn.on('error', console.error.bind(console, 'connection error:'));
+conn.once('open', () => {
+    console.log(`Vo~ila! MongoDB Connected!\n `);
+    main();
+});
+
+/*
+END OF DATABASE LAUNCH ACTIONS
+*/

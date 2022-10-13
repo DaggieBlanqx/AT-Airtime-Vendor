@@ -5,6 +5,12 @@ const { phone } = require('phone');
 const router = express.Router();
 const data = require('../data_store/logs.json');
 
+const Credential = require('../controllers/Credential.js');
+const _Credential = new Credential();
+
+const User = require('../controllers/User.js');
+const _User = new User();
+
 const {
     sendAirtime,
     doesFileExist,
@@ -12,25 +18,23 @@ const {
     createAirtimeLogs,
     getAdminInfo,
 } = require('../utils/index');
-let analyticsInfo = ()=> {
+let analyticsInfo = () => {
     // console.log(data);
     let dataResult = [];
-    data.map(element => {
+    data.map((element) => {
         let fragData = element.responses;
         let numbSent = element.numSent;
-        if( numbSent !== 0) {
-
+        if (numbSent !== 0) {
             let result = fragData.map((el) => {
-                let elem = {...el}
+                let elem = { ...el };
                 dataResult.push(elem);
             });
-            
         } else {
             return {};
         }
     });
     return dataResult;
-}
+};
 
 router.get('/', async (req, res) => {
     let adminInfo = await getAdminInfo();
@@ -196,4 +200,130 @@ router.get('/sales', (req, res) => {
     });
 });
 
+/***
+ * IGNORE BELOW ROUTES FOR NOW:
+ */
+
+router.post('/sign_up_2', async (req, res) => {
+    //receive Admin username and password -> then save it
+    const country = req.body.country;
+    const password = req.body.password;
+    const email = req.body.email;
+    const phoneNumber = req.body.phoneNumber;
+    const dataIn = {
+        country,
+        password,
+        email,
+        phoneNumber,
+    };
+
+    const output = await _User.create({ dataIn });
+
+    if (output.status === 'successful') {
+        req.session.user = {
+            admin_username,
+        };
+        // good
+        res.json(output);
+        // return res.redirect('/Credential');
+    } else {
+        //bad
+        return res.status(500).json(output);
+    }
+});
+
+router.post('/sign_in_2', async (req, res) => {
+    const password = req.body.password;
+    const email = req.body.email;
+
+    const output = await _User.getByEmail({ email });
+
+    if (output.status === 'successful') {
+        req.session.user = {
+            admin_username,
+        };
+        // good
+        res.json(output);
+        // return res.redirect('/Credential');
+    } else {
+        //bad
+        return res.status(500).json(output);
+    }
+});
+
+router.post('/add_at_credential_2', async (req, res) => {
+    //receive API Keys and username
+    const apiKey = req.body.apiKey;
+    const username = req.body.username;
+
+    const output = await _Credential.create({
+        apiKey,
+        username,
+    });
+
+    console.log({ output });
+
+    if (output.status === 'success') {
+        //good
+        return res.json(output);
+        // return res.redirect('/airtime');
+    } else {
+        //bad
+        return res.status(500).json(output);
+    }
+});
+
+router.post('/send_airtime_2', async (req, res) => {
+    try {
+        //receive phone numbers and amount
+        let errors = [];
+        let phoneNumbers = [];
+
+        let _phoneNumbers = req.body.phoneNumbers;
+        let amount = req.body.amount;
+
+        let recipients = _phoneNumbers?.split(',');
+
+        recipients.map((rp) => {
+            let phoneRegex = /^(\+[1-9]{1,3})?\d{4,}$/;
+
+            if (phoneRegex.test(rp)) {
+                phoneNumbers.push(rp);
+            } else {
+                errors.push(`Invalid phone: ${rp}`);
+            }
+        });
+
+        if (errors.length) {
+            return res.json({
+                errors,
+            });
+        }
+
+        const airtimeResult = await sendAirtime({ phoneNumbers, amount });
+        if (airtimeResult.status === 'successful') {
+            // write to file
+            console.log({ airtimeResult });
+            let output = await createAirtimeLogs({
+                singleTransaction: airtimeResult.result,
+            });
+
+            if (output.status === 'successful') {
+                return res.redirect('/analytics');
+            } else {
+                console.log({ output });
+                return res.redirect('/analytics');
+                return res.json(output);
+            }
+        } else {
+            return res.status(500).json({
+                ...airtimeResult,
+            });
+        }
+    } catch (err) {
+        return res.status(500).json({
+            ...err,
+        });
+    }
+});
 module.exports = router;

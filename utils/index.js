@@ -22,7 +22,7 @@ const sendAirtime = ({
             apiKey: apiKey || process.env.apiKey,
             username: username || process.env.username,
         };
-        console.log({credentials});
+        console.log({ credentials });
         const AT_Airtime = AfricasTalking(credentials).AIRTIME;
 
         const recipients = phoneNumbers.map((phoneNumber) => {
