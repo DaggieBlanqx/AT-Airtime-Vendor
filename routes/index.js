@@ -264,9 +264,16 @@ router.get('/admin', adminOnly, async (req, res) => {
 });
 
 router.get('/aitimeAnalytics', customerOnly, async (req, res) => {
+    const dataOut = [];
+
     const airtimeAnalytics = await _Airtime.getAll();
+
+    if (airtimeAnalytics.status === 'success') {
+        dataOut = airtimeAnalytics.data;
+    }
+
     res.render('pages/airtimeAnalytics', {
-        responseData: airtimeAnalytics,
+        responseData: dataOut,
     });
 });
 
