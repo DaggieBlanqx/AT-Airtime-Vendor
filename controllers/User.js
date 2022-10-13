@@ -106,7 +106,12 @@ User.prototype.getByPhoneNumber = function ({ phoneNumber }) {
 User.prototype.getAll = function () {
     return new Promise((resolve, reject) => {
         _User.find({}, (err, docs) => {
-            err ? reject(err) : resolve(docs);
+            err
+                ? reject(err)
+                : resolve({
+                      status: 'success',
+                      data: docs,
+                  });
         });
     });
 };

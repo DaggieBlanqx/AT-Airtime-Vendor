@@ -57,8 +57,31 @@ Sms.prototype.getById = function ({ SmsId }) {
 Sms.prototype.getAll = function () {
     return new Promise((resolve, reject) => {
         _Sms.find({}, (err, docs) => {
-            err ? reject(err) : resolve(docs);
+            err
+                ? reject(err)
+                : resolve({
+                      status: 'success',
+                      data: docs,
+                  });
         });
+    });
+};
+
+Sms.prototype.getAll_Detailed = function () {
+    return new Promise((resolve, reject) => {
+        _Sms.find({})
+            .populate('user')
+            .exec(function (err, docs) {
+                if (err) {
+                    reject({ ...err });
+                } else {
+                    resolve({
+                        status: 'success',
+                        data: docs,
+                    });
+                }
+                // do something
+            });
     });
 };
 

@@ -130,11 +130,62 @@ router.get('/airtime', customerOnly, needsATcredentials, (req, res) =>
 router.get('/sms', customerOnly, needsATcredentials, (req, res) =>
     res.render('pages/sms')
 );
-router.get('/admin', adminOnly, (req, res) =>
-    res.render('pages/admin', {
-        responseData: analyticsAdmin(),
-    })
-);
+
+router.get('/_admin', adminOnly, async (req, res) => {
+    let errors = [];
+    const allSMS = await _Sms.getAll();
+
+    if (allSMS.status === 'success') {
+    } else {
+        errors.push({ msg: '' });
+    }
+});
+
+router.get('/admin', adminOnly, async (req, res) => {
+    const partitionedSMS = {};
+    const partitionedAirtime = {};
+    const errors = [];
+
+    const allSMS = await _Sms.getAll();
+    const allAirtime = await _Airtime.getAll();
+
+    if (allSMS.status === 'success') {
+        allSMS.data.map((d) => {
+            let _userId = d.user._id.toString();
+            let newSMS = d.cost;
+
+            if (partitionedSMS[_userId]) {
+                partitionedSMS[_userId] = [...partitionedSMS[_userId], newSMS];
+            } else {
+                partitionedSMS[_userId] = [newSMS];
+            }
+        });
+    } else {
+        errors.push({
+            msg: 'Could not get the SMSes',
+        });
+    }
+
+    if (allSMS.status === 'success') {
+        allSMS.data.map((d) => {
+            let _userId = d.user._id.toString();
+            let newSMS = d.cost;
+
+            if (partitionedSMS[_userId]) {
+                partitionedSMS[_userId] = [...partitionedSMS[_userId], newSMS];
+            } else {
+                partitionedSMS[_userId] = [newSMS];
+            }
+        });
+    } else {
+        errors.push({
+            msg: 'Could not get the SMSes',
+        });
+    }
+
+    res.json({ partitionedSMS });
+});
+
 router.get('/aitimeAnalytics', customerOnly, async (req, res) => {
     const airtimeAnalytics = await _Airtime.getAll();
     res.render('pages/airtimeAnalytics', {

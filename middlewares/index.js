@@ -42,7 +42,8 @@ const logTraffic = async (req, res, next) => {
 
 const adminOnly = async (req, res, next) => {
     const loggedInUser = req.session.user;
-    if (loggedInUser && loggedInUser.isAdmin) {
+    console.log({ loggedInUser });
+    if (loggedInUser && loggedInUser.userType === 'admin') {
         next();
     } else {
         req.session.user = null;
@@ -73,19 +74,13 @@ const shouldNotBeLoggedIn = async (req, res, next) => {
 
 const needsATcredentials = async (req, res, next) => {
     const loggedInUser = req.session.user;
-    if (loggedInUser) {
-        const output = await _Credential.getByOwner({
-            ownedBy: loggedInUser._id,
-        });
 
-        if (output.status === 'success') {
-            next();
-        } else {
-            return res.render('pages/credentials', {
-                warningMessage: `You need to set your Africa's Talking API keys first!`,
-                overwriteMessage: null,
-            });
-        }
+    const output = await _Credential.getByOwner({
+        ownedBy: loggedInUser._id,
+    });
+
+    if (output.status === 'success') {
+        next();
     } else {
         return res.render('pages/credentials', {
             warningMessage: `You need to set your Africa's Talking API keys first!`,
