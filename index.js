@@ -3,17 +3,17 @@ const path = require('path');
 const config = require('config');
 const bodyParser = require('body-parser');
 const session = require('express-session');
-const MongoStore = require('connect-mongo');
 const cors = require('cors');
 const mongoose = require('mongoose');
-const { v4: uuidv4 } = require('uuid');
+const MongoDBStore = require('connect-mongodb-session');
+const mongoStore = MongoDBStore(session);
 
 process.env = {
     ...config.get('WEB_APP'),
     ...process.env,
 };
 
-let indexRoutes = require('./routes/new-index.js');
+let indexRoutes = require('./routes/index.js');
 
 const main = async () => {
     const app = express();
@@ -26,75 +26,34 @@ const main = async () => {
     app.use(express.json());
     app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
     app.use(express.urlencoded({ extended: false }));
-
-    let corsConfig = () => {
-        return {
-            origin: '*',
-            methods: ['GET', 'PUT', 'POST', 'DELETE', 'OPTIONS'],
-            allowedHeaders: [
-                'Content-Type',
-                ' Authorization',
-                'Accept',
-                ' Accept-Language',
-                ' Content-Language',
-                ' Content-Type',
-                'mode',
-                'credentials',
-                'x-auth-token',
-                'Access-Control-Allow-Origin',
-                'token',
-                'x-active-company',
-            ],
-            exposedHeaders: [
-                'Content-Type',
-                ' Authorization',
-                'Content-Range',
-                'X-Content-Range',
-                'x-auth-token',
-                'Access-Control-Allow-Origin',
-                'token',
-                'x-active-company',
-            ],
-            credentials: true,
-            maxAge: 3600,
-            preflightContinue: true,
-            optionsSuccessStatus: 204,
-        };
-    };
-
-    app.use(cors(corsConfig()));
+    app.use(cors());
     app.set('trust proxy', 1); // trust first proxy
+
+    //Code in server.js/index.js (Depending on your server entry point)
+    const store = new mongoStore({
+        collection: 'userSessions',
+        uri: process.env.mongoDBUri,
+        expires: 100000000000000,
+    });
     app.use(
         session({
-            secret: '1234567890',
-            resave: false,
+            name: 'SESS_NAME',
+            secret: 'SESS_SECRET',
+            store: store,
             saveUninitialized: false,
-            cookie: { secure: true },
+            resave: false,
+            proxy: true, // Required for Heroku & Digital Ocean (regarding X-Forwarded-For)
+            cookie: {
+                sameSite: false,
+                secure: false,
+                httpOnly: true,
+            },
         })
     );
 
-    // app.use(session({
-    //     genid: (req) => {
-    //       return uuidv4()
-    //     },
-    //     secret: process.env.EXPRESS_SESSION_SECRET,
-    //     resave: true,
-    //     saveUninitialized: false,
-    //     cookie: { maxAge: 24 * 60 * 60 * 1000 },
-    //     store: MongoStore.create({
-    //       client: mongoose.connection.getClient(),
-    //       dbName: process.env.MONGO_DB_NAME,
-    //       collectionName: "sessions",
-    //       stringify: false,
-    //       autoRemove: "interval",
-    //       autoRemoveInterval: 1
-    //       })
-    //     })
-    //   );
-
     app.use('*', (req, res, next) => {
         console.log({
-            user: req.session.user,
+            session: req.session.user,
         });
 
         next();

@@ -3,7 +3,11 @@ const express = require('express');
 const { phone } = require('phone');
 
 const router = express.Router();
-const { adminData, smsData, airtimeData } = require('../data_store/logs.json');
+// const { adminData, smsData, airtimeData } = require('../data_store/logs.json');
+
+const adminData = [],
+    smsData = [],
+    airtimeData = [];
 
 const Credential = require('../controllers/Credential.js');
 const _Credential = new Credential();
@@ -133,8 +137,9 @@ router.post('/sign_up', async (req, res) => {
         return res.status(500).json(output);
     }
 });
-
+/*
 router.post('/sign_in', async (req, res) => {
+    console.log({body: req.body})
     //receive Admin username and password
     const admin_username = req.body.admin_username;
     const admin_password = req.body.admin_password;
@@ -160,6 +165,26 @@ router.post('/sign_in', async (req, res) => {
         admin_password,
         data,
     });
+});
+*/
+
+router.post('/sign_in', async (req, res) => {
+    const password = req.body.password;
+    const email = req.body.email;
+
+    const output = await _User.getByEmail({ email });
+    req.session.user = {
+        email,
+    };
+
+    if (output.status === 'success') {
+        // good
+        res.json(output);
+        // return res.redirect('/Credential');
+    } else {
+        //bad
+        return res.status(500).json(output);
+    }
 });
 
 router.post('/add_at_credentials', async (req, res) => {

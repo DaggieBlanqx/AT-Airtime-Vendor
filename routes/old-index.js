@@ -90,8 +90,9 @@ router.get('/signup', (req, res) => res.render('pages/signup'));
 router.get('/credentials', (req, res) => res.render('pages/credentials'));
 router.get('/airtime', (req, res) => res.render('pages/airtime'));
 router.get('/sms', (req, res) => res.render('pages/sms'));
-router.get('/admin', (req, res) => res.render('pages/admin', {
-    responseData: analyticsAdmin(),
+router.get('/admin', (req, res) =>
+    res.render('pages/admin', {
+        responseData: analyticsAdmin(),
     })
 );
 router.get('/aitimeAnalytics', (req, res) =>
