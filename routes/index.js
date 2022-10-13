@@ -278,9 +278,22 @@ router.get('/aitimeAnalytics', customerOnly, async (req, res) => {
 });
 
 router.get('/smsAnalytics', customerOnly, async (req, res) => {
-    const smsAnalytics = await _Sms.getAll();
+    // const smsAnalytics = await _Sms.getAll();
+    // res.render('pages/smsAnalytics', {
+    //     responseData: smsAnalytics,
+    // });
+
+
+    const dataOut = [];
+
+    const smsAnalytics = await _Airtime.getAll();
+
+    if (smsAnalytics.status === 'success') {
+        dataOut = smsAnalytics.data;
+    }
+
     res.render('pages/smsAnalytics', {
-        responseData: smsAnalytics,
+        responseData: dataOut,
     });
 });
 
