@@ -13,7 +13,7 @@ process.env = {
     ...process.env,
 };
 
-let indexRoutes = require('./routes/index.js');
+let indexRoutes = require('./routes/new-index.js');
 
 const main = async () => {
     const app = express();
