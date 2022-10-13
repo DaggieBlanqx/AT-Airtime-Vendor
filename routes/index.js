@@ -48,6 +48,24 @@ let analyticsSms = () => {
     return dataResult;
 };
 
+let analyticsAdmin = () => {
+    // console.log(data);
+    let dataResult = [];
+    data.map((element) => {
+        let fragData = element.responses;
+        let numbSent = element.numSent;
+        if (numbSent !== 0) {
+            let result = fragData.map((el) => {
+                let elem = { ...el };
+                dataResult.push(elem);
+            });
+        } else {
+            return {};
+        }
+    });
+    return dataResult;
+};
+
 // router.get('/', async (req, res) => {
 //     let adminInfo = await getAdminInfo();
 
@@ -72,6 +90,10 @@ router.get('/signup', (req, res) => res.render('pages/signup'));
 router.get('/credentials', (req, res) => res.render('pages/credentials'));
 router.get('/airtime', (req, res) => res.render('pages/airtime'));
 router.get('/sms', (req, res) => res.render('pages/sms'));
+router.get('/admin', (req, res) => res.render('pages/admin', {
+    responseData: analyticsAdmin(),
+    })
+);
 router.get('/aitimeAnalytics', (req, res) =>
     res.render('pages/airtimeAnalytics', {
         responseData: analyticsAirtime(),
