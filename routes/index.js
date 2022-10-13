@@ -1,7 +1,7 @@
 'use strict';
 const express = require('express');
 const { phone } = require('phone');
-
+const { customerOnly, adminOnly } = require('../middlewares/index');
 const router = express.Router();
 // const { adminData, smsData, airtimeData } = require('../data_store/logs.json');
 
@@ -95,22 +95,37 @@ let analyticsAdmin = () => {
 //     }
 // });
 
-router.get('/', (req, res) => res.render('pages/index'));
+router.get('/', (req, res) => {
+    const loggedInUser = req.session.user;
+    if (loggedInUser) {
+        return res.redirect('/airtime');
+    } else {
+        return res.render('pages/index', { warningMessage: null });
+    }
+});
+
+router.use('/sign_out', (req, res) => {
+    req.session.user = null;
+    return res.redirect('/');
+});
+
 router.get('/signup', (req, res) => res.render('pages/signup'));
-router.get('/credentials', (req, res) => res.render('pages/credentials'));
-router.get('/airtime', (req, res) => res.render('pages/airtime'));
-router.get('/sms', (req, res) => res.render('pages/sms'));
-router.get('/admin', (req, res) =>
+router.get('/credentials', customerOnly, (req, res) =>
+    res.render('pages/credentials')
+);
+router.get('/airtime', customerOnly, (req, res) => res.render('pages/airtime'));
+router.get('/sms', customerOnly, (req, res) => res.render('pages/sms'));
+router.get('/admin', adminOnly, (req, res) =>
     res.render('pages/admin', {
         responseData: analyticsAdmin(),
     })
 );
-router.get('/aitimeAnalytics', (req, res) =>
+router.get('/aitimeAnalytics', customerOnly, (req, res) =>
     res.render('pages/airtimeAnalytics', {
         responseData: analyticsAirtime(),
     })
 );
-router.get('/smsAnalytics', (req, res) =>
+router.get('/smsAnalytics', customerOnly, (req, res) =>
     res.render('pages/smsAnalytics', {
         responseData: analyticsSms(),
     })
@@ -169,21 +184,32 @@ router.post('/sign_in', async (req, res) => {
 */
 
 router.post('/sign_in', async (req, res) => {
-    const password = req.body.password;
+    const incomingPassword = req.body.password;
     const email = req.body.email;
-
     const output = await _User.getByEmail({ email });
-    req.session.user = {
-        email,
-    };
-
-    if (output.status === 'success') {
+    if (output && output.status === 'success') {
         // good
-        res.json(output);
-        // return res.redirect('/Credential');
+        const { _id, isAdmin, userType, country, password } = output;
+        if (password === incomingPassword) {
+            req.session.user = {
+                email,
+                _id,
+                isAdmin,
+                userType,
+                country,
+                password,
+            };
+            return res.redirect('/');
+        } else {
+            return res.render('pages/index', {
+                warningMessage: '🤥 Incorrect password!',
+            });
+        }
     } else {
-        //bad
-        return res.status(500).json(output);
+        return res.render('pages/index', {
+            warningMessage:
+                '😱 Invalid email. You need to sign up if you do not have an account.',
+        });
     }
 });
 

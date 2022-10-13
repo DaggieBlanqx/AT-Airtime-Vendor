@@ -52,9 +52,9 @@ const main = async () => {
     );
 
     app.use('*', (req, res, next) => {
-        console.log({
-            session: req.session.user,
-        });
+        const loggedInUser = req.session.user;
+
+        console.log({ loggedInUser });
 
         next();
     });

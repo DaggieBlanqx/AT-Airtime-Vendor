@@ -6,10 +6,10 @@ var User = function () {
     this.available = true;
 };
 
-var errNotFound = function (e) {
+var errNotFound = function ({ err, msg }) {
     return {
-        err: e,
-        msg: 'Not found',
+        err: err || null,
+        msg: msg || 'Not found',
     };
 };
 
@@ -64,7 +64,17 @@ User.prototype.getByEmail = function ({ email }) {
             if (err) {
                 reject(err);
             } else {
-                resolve(docs);
+                if (docs) {
+                    resolve({
+                        status: 'success',
+                        ...docs._doc,
+                    });
+                } else {
+                    resolve({
+                        status: 'failed',
+                        msg: 'Email not found',
+                    });
+                }
             }
         });
     });
